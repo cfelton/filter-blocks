@@ -17,6 +17,9 @@ def filter_fir_shared_folded(clock, reset, x, y, b):
         y (Samples): output sample stream.
         b (tuple, list,): filter coefficients.
     """
+    assert isinstance(x, Samples)
+    assert isinstance(y, Samples)
+
     ntaps = len(b)
     scnt = Signal(intbv(ntaps+1, min=0, max=ntaps+2))
     pmax = x.data.max * x.data.max

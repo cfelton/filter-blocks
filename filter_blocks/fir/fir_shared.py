@@ -15,6 +15,9 @@ def filter_fir_shared(clock, reset, x, y, b):
         y (Samples): sample stream output from the filter.
         b (tuple, list,): filter coefficients.
     """
+    assert isinstance(x, Samples)
+    assert isinstance(y, Samples)
+
     ntaps = len(b)
     scnt = Signal(intbv(ntaps+1, min=0, max=ntaps+2))
     pmax = x.data.max * x.data.max

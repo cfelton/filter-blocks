@@ -8,7 +8,7 @@ from myhdl import Signal, SignalType, ResetSignal, intbv, delay
 class Clock(SignalType):
     def __init__(self, val=bool(0), frequency=1):
         self.frequency = frequency
-        super(Clock, self).__init__(val)
+        super(Clock, self).__init__(bool(val))
 
     @hdl.block
     def process(self, hticks=None):
@@ -20,8 +20,9 @@ class Clock(SignalType):
         @hdl.instance
         def beh_clock():
             self.next = False
-            yield delay(hticks)
-            self.next = not self.val
+            while True:
+                yield delay(hticks)
+                self.next = not self.val
 
         return beh_clock
 
@@ -40,16 +41,11 @@ class Reset(ResetSignal):
         yield delay(10)
 
 
-def check_word_fomat(w):
-    if len(w) == 2:
-        fwl = w[0] - w[1] - 1
-        assert fwl >= 0
-        wf = (w[0], w[1], )
-    elif len(w) == 3:
-        wf = w
-    else:
-        raise Exception("Invalid word format")
-    return wf
+class Global(object):
+    def __init__(self, clock, reset):
+        self.clock = clock
+        self.reset = reset
+        self.enable = Signal(bool(0))
 
 
 class Samples(object):
@@ -100,3 +96,39 @@ class Samples(object):
                         sc += 1
 
         return beh_record
+
+
+def check_word_fomat(w):
+    if len(w) == 2:
+        fwl = w[0] - w[1] - 1
+        assert fwl >= 0
+        wf = (w[0], w[1], )
+    elif len(w) == 3:
+        wf = w
+    else:
+        raise Exception("Invalid word format")
+    return wf
+
+
+def Signals(sigtype, num_sigs):
+    """ Create a list of signals
+    Arguments:
+        sigtype (bool, intbv): The type to create a Signal from.
+        num_sigs (int): The number of signals to create in the list
+    Returns:
+        sigs: a list of signals all of type `sigtype`
+
+    Creating multiple signals of the same type is common, this
+    function helps facilitate the creation of multiple signals of
+    the same type.
+
+    The following example creates two signals of bool
+        >>> enable, timeout = Signals(bool(0), 2)
+
+    The following creates a list-of-signals of 8-bit types
+        >>> mem = Signals(intbv(0)[8:], 256)
+    """
+    assert isinstance(sigtype, (bool, intbv))
+    sigs = [Signal(sigtype) for _ in range(num_sigs)]
+    return sigs
+

@@ -24,6 +24,8 @@ def pipes(clock, reset, ti, to, vi, vo):
 
 @hdl.block
 def filter_fir_parallel_pipeline(clock, reset, x, y, h, multpipe=3):
+    assert isinstance(x, Samples)
+    assert isinstance(y, Samples)
 
     ntaps = len(h)
 

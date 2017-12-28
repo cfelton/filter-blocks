@@ -1,2 +1,3 @@
 
-from iir import FilterIIR
+from .iir import FilterIIR
+from .fir import FilterFIR

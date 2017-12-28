@@ -4,11 +4,15 @@ from math import log, ceil
 import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
 
+from filter_blocks.support import Samples
+
 
 @hdl.block
 def filter_fir_parallel(clock, reset, x, y, h):
     """ A basic FIR filter description
     """
+    assert isinstance(x, Samples)
+    assert isinstance(y, Samples)
 
     xd = [Signal(intbv(0, min=x.data.min, max=x.data.max))
           for _ in range(len(h)-1)]

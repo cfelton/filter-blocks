@@ -25,6 +25,10 @@ wheels/
 .installed.cfg
 *.egg
 
+# Project specific
+zrun*.py
+info_exchanges/
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
