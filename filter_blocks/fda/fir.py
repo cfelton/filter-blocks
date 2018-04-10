@@ -36,7 +36,6 @@ class FilterFIR(FilterHardware):
             while True:
                 yield clock.posedge
 
-                #
                 if x.valid:
                     xd.insert(0, int(smpi.data))
                     xd.pop(-1)

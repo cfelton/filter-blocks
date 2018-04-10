@@ -67,7 +67,11 @@ class Samples(object):
         self.imin = imin = min
 
         # @todo: use the dtype
-        self.data = Signal(intbv(0, min=imin, max=imax))
+        if dtype == intbv:
+            val = intbv(0, min=imin, max=imax)
+        else:
+            val = dtype(0)
+        self.data = Signal(val)
         self.valid = Signal(bool(0))
 
         self.sample_rate = sample_rate
