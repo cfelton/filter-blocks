@@ -1,23 +1,3 @@
-"""
-Simple IIR Filter
-=================
-The following is a straight foward HDL description of a
-direct-form I IIR filter.  This module can be used to
-generate synthesizable Verilg/VHDL.
-How to use this module
-----------------------
- 1. Instantiate an instance of the iir_filter, pass the
-    desired low-pass frequency cutoff (`fc`) and the
-    sample rate (`fs`).
- 2. Test the frequency response with a random input simulation.
-    Collect the random inputs and the filter outputs, compute
-    the FFT of each and H(w) = Y(w) / X(w).
- 3. If all looks good create the Verilog and VHDL.
-This code is discussed in the following:
-http://www.fpgarelated.com/showarticle/7.php
-http://dsp.stackexchange.com/questions/1605/designing-butterworth-filter-in-matlab-and-obtaining-filter-a-b-coefficients-a
-:Author: Christopher Felton <chris.felton@gmail.com>
-"""
 
 import myhdl as hdl
 from myhdl import Signal, intbv, always, always_comb, SignalType, traceSignals, block, delay, instance, Simulation, StopSimulation
