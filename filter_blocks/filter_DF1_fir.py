@@ -1,68 +1,71 @@
-
-import myhdl as hdl
-from myhdl import Signal, intbv, always, always_comb, SignalType, traceSignals, block, delay, instance, Simulation, StopSimulation
-import numpy as np
-
-
-def filter_iir(clk,reset, x, y, b, w=(24,0)):
+@hdl.block
+def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
     """Basic IIR direct-form I filter.
+
     Ports:
         glbl (Global): global signals.
-        x (SignalBus): input digital signal.
-        y (SignalBus): output digitla signal.
+        sigin (SignalBus): input digital signal.
+        sigout (SignalBus): output digitla signal.
+
     Args:
         b (tuple, list): numerator coefficents.
-        a (tuple, list): denominator coefficents.
+
     Returns:
         inst (myhdl.Block, list):
     """
-    assert isinstance(x, SignalBus)
-    assert isinstance(y, SignalBus)
+    assert isinstance(sigin, Samples)
+    assert isinstance(sigout, Samples)
     assert isinstance(b, tuple)
 
     # All the coefficients need to be an `int`, the
     # class (`???`) handles all the float to fixed-poit
     # conversions.
     rb = [isinstance(bb, int) for bb in b]
-   # assert all(ra)
-   # assert all(rb)
+    assert all(rb)
 
+    w = sigin.word_format
     ymax = 2**(w[0]-1)
-    vmax = 2**(2*w[0])  # double widht max and min
+    vmax = 2**(2*w[0])  # double width max and min
     vmin = -vmax
 
     # Quantized IIR coefficients
-    b0, b1, b2= b
-    q, qd = w[0]-1, 2*w[0]
-   
+    b0, b1, b2 = b
 
-   # print(b0,b1,b2,a1,a2)
-   # print(x.data, x.valid, b0,b1, reset)
-
+    # Locally reference the interface signals
+    clock, reset = glbl.clock, glbl.reset
+    xdv = sigin.valid
+    y, ydv = sigout.data, sigout.valid 
+    x = Signal(intbv(0, min=vmin, max=vmax))           #note change: x a signal 
+    
     # Delay elements, list-of-signals (double length for all)
     ffd = [Signal(intbv(0, min=vmin, max=vmax)) for _ in range(2)]
-
     yacc = Signal(intbv(0, min=vmin, max=vmax))
-    ys = Signal(intbv(0, min=-ymax, max=ymax))
+    dvd = Signal(bool(0))
 
-    #clock, reset = glbl.clock, glbl.reset
-
-    @always(clk.posedge)
+    @always(clock.posedge)
     def beh_direct_form_one():
-        print (x.valid)
-        if x.valid:
+        if sigin.valid:
+            x.next=sigin.data                          # note change: x needs to be a signal in order to use next attribute
             ffd[1].next = ffd[0]
-            ffd[0].next = x.data
-        
+            ffd[0].next = x
+            
 
-        # double precision accumulator
-        y.data.next = yacc[qd:q].signed()
-        y.valid.next = True if x.valid else False
 
-    return beh_direct_form_one
     @always_comb
     def beh_acc():
-        # double precision accumulator
-        yacc.next = (b0*x.data) + (b1*ffd[0]) + (b2*ffd[1]) 
+         #double precision accumulator 
+         yacc.next = (b0 * x) + (b1 * ffd[0]) + (b2 * ffd[1]) 
 
-    return beh_acc
+       
+       
+
+
+    @always_seq(clock.posedge, reset=reset)
+    def beh_output():
+        dvd.next = xdv
+        y.next = yacc.signed()
+        ydv.next = dvd
+
+    # @todo add shared multiplier version ...
+
+    return beh_direct_form_one,beh_acc,beh_output     # note change: this replaces hdl.instances(), which was throwing errors
