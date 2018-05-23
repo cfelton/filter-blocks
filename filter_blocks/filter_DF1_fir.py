@@ -1,6 +1,6 @@
 @hdl.block
 def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
-    """Basic IIR direct-form I filter.
+    """Basic FIR direct-form I filter. Present implementation is of order 2
 
     Ports:
         glbl (Global): global signals.
@@ -49,16 +49,10 @@ def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
             ffd[1].next = ffd[0]
             ffd[0].next = x
             
-
-
     @always_comb
     def beh_acc():
          #double precision accumulator 
          yacc.next = (b0 * x) + (b1 * ffd[0]) + (b2 * ffd[1]) 
-
-       
-       
-
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
