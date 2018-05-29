@@ -1,11 +1,10 @@
-
 import myhdl as hdl
-from myhdl import Signal, intbv, delay
+from myhdl import Signal, intbv, delay, traceSignals, StopSimulation
+from filter_blocks.support import Clock, Reset, Global, Samples,ResetSignal
+from filter_blocks.fir import fir_df1 
 
-from filter_blocks.support import Clock, Reset, Global, Samples
-
-@block
-def testBenchIIR():
+@hdl.block
+def testBenchFIR():
     
     glbl=Global
     glbl.clock=Signal(bool(1))
@@ -18,13 +17,13 @@ def testBenchIIR():
     b=(1,2,1)
     w=(24,23)
 
-    fir=filter_fir(glbl, xt, yt, b,w)
+    fir=fir_df1.filter_fir(glbl, xt, yt, b,w)
     
-    @always(delay(10))
+    @hdl.always(delay(10))
     def clkgen():
         glbl.clock.next = not glbl.clock
 
-    @instance
+    @hdl.instance
     def stimulus():
          "input for test bench taken from text file test.txt"
          for line in open('test.txt'):
@@ -38,7 +37,7 @@ def testBenchIIR():
     return fir, clkgen, stimulus
 
 def main():
-   tb = traceSignals(testBenchIIR())
+   tb = traceSignals(testBenchFIR())
    tb.run_sim()
 
 
