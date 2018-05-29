@@ -5,7 +5,7 @@ from filter_blocks.support import Samples
 
 @hdl.block
 def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
-    """Basic IIR direct-form I filter.
+    """Basic FIR direct-form I filter.
 
     Ports:
         glbl (Global): global signals.
@@ -71,12 +71,5 @@ def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
         dvd.next = xdv
         y.next = yacc.signed()
         ydv.next = dvd
-        #print(y)
-        f= open("filterFIRoutput.txt","a+")
-        f.write(str(yacc.val))
-        f.write("\r\n")
-        f.close()
-        print (yacc.val)
-
 
     return beh_direct_form_one,beh_output
