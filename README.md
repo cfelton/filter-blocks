@@ -1,4 +1,8 @@
 
+
+[![Code Health](https://landscape.io/github/cfelton/filter-blocks/master/landscape.svg?style=flat)](https://landscape.io/github/cfelton/filter-blocks/master)
+
+
 This repository contains a collection of hardware
 digital filter implementations coded with [myhdl](http://myhdl.org).
 
