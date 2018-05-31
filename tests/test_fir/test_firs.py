@@ -12,9 +12,9 @@ from filter_blocks.fda import FilterFIR
 
 def test_filters(args=None):
     if args is None:
-        ntaps, nbands, fs, imax = 86, 20, 1e5, 2**7
+        ntaps, nbands, fs, imax = 86, 3, 1e5, 2**7
         nsmps = 3*ntaps
-    # @todo: get the following from args
+    # TODO: get the following from args
 
     clock = Clock(0, frequency=50e6)
     reset = Reset(0, active=0, async=True)
@@ -34,7 +34,7 @@ def test_filters(args=None):
     dibv = intbv(0, min=-imax, max=imax)
     dds1 = DDSine(1e3, fs, 0.8, 0, dibv)
 
-    # @todo: get coefficients
+    # TODO: get coefficients
     # bi, b = get_fir_coef()
     b = np.ones(ntaps) / ntaps
     bi = b * imax
@@ -67,7 +67,7 @@ def test_filters(args=None):
             for ff in flist:
                 # Avoid the transitions
                 dds1.set_frequency(ff)
-                for ii in range(ntaps+7):
+                for _ in range(ntaps+7):
                     yield xi.valid.posedge
                 dds1.set_zero(False)
                 yield clock.posedge
@@ -77,7 +77,6 @@ def test_filters(args=None):
                     sr.record = True
 
                 # Collect a sample from each filter
-
 
                 for sr in rlist:
                     sr.record = False

@@ -44,7 +44,7 @@ class FilterFIR(FilterHardware):
                     for ii in range(ntaps):
                         sop = sop + (h[ii] * xd[ii])
 
-                    y.data.next = sop
+                    y.data.next = int(round(sop))
                     y.valid.next = True
                 else:
                     y.valid.next = False
