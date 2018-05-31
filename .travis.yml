@@ -13,7 +13,7 @@ install:
 # run the test
 script:
   - cd tests
-  - coverage run --source=filter_blocks -m py.test --include-reference
+  - coverage run --source=filter_blocks -m py.test
   - cp .coverage ../
 
 after_success:
