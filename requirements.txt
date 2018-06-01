@@ -1,0 +1,6 @@
+numpy
+scipy
+myhdl
+pytest
+coverage
+coveralls
