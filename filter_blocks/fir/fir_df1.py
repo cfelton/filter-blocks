@@ -21,7 +21,8 @@ def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
     assert isinstance(sigin, Samples)
     assert isinstance(sigout, Samples)
     assert isinstance(b, tuple)
-
+    print("hello")
+    print(b)
     # All the coefficients need to be an `int`, the
     # class (`???`) handles all the float to fixed-poit
     # conversions.
@@ -48,6 +49,8 @@ def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
+        #print(sigin.valid)
+        print(sigin.data)
         if sigin.valid:
             x.next=sigin.data
             #print("hello from inside")
@@ -71,5 +74,6 @@ def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
         dvd.next = xdv
         y.next = yacc.signed()
         ydv.next = dvd
+        print(yacc)
 
     return beh_direct_form_one,beh_output
