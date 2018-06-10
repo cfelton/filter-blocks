@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/cfelton/filter-blocks/badge.svg?branch=master)](https://coveralls.io/github/cfelton/filter-blocks?branch=master)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![codebeat badge](https://codebeat.co/badges/fd78906c-9f59-44e5-8c9a-d31d2439fa46)](https://codebeat.co/projects/github-com-cfelton-filter-blocks-master)
 [![Code Health](https://landscape.io/github/cfelton/filter-blocks/master/landscape.svg?style=flat)](https://landscape.io/github/cfelton/filter-blocks/master)
 
 
