@@ -1,20 +1,20 @@
 import myhdl as hdl
-from myhdl import Signal, intbv, StopSimulation, delay
+from myhdl import Signal, intbv, StopSimulation, delay, ResetSignal, traceSignals
 from filter_blocks.support import Clock, Reset, Global, Samples
-from filter_blocks.fir.iir_parallel import filter_fir_sos
-from filter_blocks.fda import fir_test as ft
+from filter_blocks.iir.iir_parallel import filter_fir_sos
 
 
 @hdl.block
 def testBenchFIR():
     
-    clock = Clock(0, frequency=50e6)
-    reset = Reset(0, active=0, async=True)
-    glbl = Global(clock, reset)
+    glbl=Global
+    glbl.clock=Signal(bool(1))
+    glbl.reset=ResetSignal(bool(1),bool(0),True)
     x= Signal(intbv(0)[8:])
     y= Signal(intbv(0)[20:])
      #if using sos
-    b=[[1,0,1] ,[0,0,1]]
+    b=[[1, 0, 1] ,[0, 0, 1]]
+    a=[[1, 0],[1, 0]]
  
     w=(24,0)
     
@@ -25,7 +25,7 @@ def testBenchFIR():
     w=(24,23)
     
 
-    mov=filter_fir_sos(glbl, xt, yt, b,w) # use when calling sos
+    mov=filter_fir_sos(glbl, xt, y, b, a, w) # use when calling sos
     #mov=filter_fir(glbl, xt, yt, b,w) # use when sirectly calling iir
     
     @hdl.always(delay(10))
@@ -46,7 +46,10 @@ def testBenchFIR():
     return mov, clkgen, stimulus
 
 def main():
-   tb = testBenchFIR()
+#    tb = testBenchFIR()
+#    tb.run_sim()
+
+   tb = traceSignals(testBenchFIR())
    tb.run_sim()
 
 
