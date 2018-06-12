@@ -33,8 +33,6 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     vmax = 2**(2*w[0])  # double width max and min
     vmin = -vmax
     N = len(b)-1
-    clock, reset = glbl.clock, glbl.reset
-
     # Quantized IIR coefficients
     b0, b1, b2 = b
     a1, a2 = a
@@ -43,31 +41,31 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     # Locally reference the interface signals
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
-    #y, ydv = sigout.data, sigout.valid 
-    y, ydv = sigout, bool(1)
+    y = sigout
     x = Signal(intbv(0, min=vmin, max=vmax))
+
     # Delay elements, list-of-signals (double length for all)
     ffd = Signals(intbv(0, min=vmin, max=vmax), N)
     fbd = Signals(intbv(0, min=vmin, max=vmax), N)
     yacc = Signal(intbv(0, min=vmin, max=vmax))
     dvd = Signal(bool(0))
 
+
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
-        #if sigin.valid:
-        x.next=sigin.data       
-        ffd[1].next = ffd[0]
-        ffd[0].next = x
+        if sigin.valid:
+            x.next=sigin.data       
+            ffd[1].next = ffd[0]
+            ffd[0].next = x
 
-        fbd[1].next = fbd[0]
-        fbd[0].next = yacc[qd:q].signed()
+            fbd[1].next = fbd[0]
+            fbd[0].next = yacc[qd:q].signed()
 
-        #print (yacc.val)
             
     @hdl.always_comb
     def beh_acc():
          #double precision accumulator 
-         yacc.next = (b0 * x) + (b1 * ffd[0]) + (b2 * ffd[1]) \
+        yacc.next = (b0 * x) + (b1 * ffd[0]) + (b2 * ffd[1]) \
                     - (a1 * fbd[0]) - (a2 * fbd[1])
        
        
@@ -75,74 +73,48 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     def beh_output():
         dvd.next = xdv
         y.next = yacc.signed()
-        #ydv.next = dvd
-        #print(y)
-
-    # @todo add shared multiplier version ...
 
     return beh_direct_form_one, beh_acc, beh_output
 
-# @hdl.block
-# def summer(glbl, b, y_i ):
-
-#     """IIR sum of sections ...
-#     """
-#     yfinal=y_i.data
-#     clock, reset = glbl.clock, glbl.reset
-#     @hdl.always(clock.posedge)
-#     def pls():
-#         yfinal=y_i.data
-#         for ii in range(len(b)):
-#             yfinal=yfinal+y_i.data[ii]
-#             #print(y_i.data)
-
-#         print(y_i.data)
-
-#     return pls
 
 
 @hdl.block
-def summer(glbl, b, ysum):
+def parallel_sum(glbl, b, yin, yout):
 
-    """IIR sum of sections ...
+    """sum of all the individial parallel outputs ...
     """
-    
     clock, reset = glbl.clock, glbl.reset
     k= Signal(intbv(0)[8:])
-    yfinal = Samples(k.min, k.max)
+    yout = Samples(k.min, k.max)
+    
     @hdl.always(clock.posedge)
-    def pls():
-        yfinal.data = 0
-        for ii in range(len(b)):    #cehck if it should be +1 or nor
-            yfinal.data=yfinal.data+ysum[(ii+1)*20:ii*20]
+    def output():
+        yout.data = 0
+        for ii in range(len(b)):
+            yout.data=yout.data+yin[(ii+1)*20:ii*20]
 
-        print(yfinal.data)
+        print(yout.data)
 
-    return pls
+    return output
 
 @hdl.block
-def filter_fir_sos(glbl, x, y, b, a, w):
-    """IIR sum of sections ...
+def filter_iir_parallel(glbl, x, y, b, a, w):
+    """structural model of parallel filters ...
     """
+    assert len(b) == len(a)
     number_of_sections = len(b)
     list_of_insts = [None for _ in range(number_of_sections)]
-    list_of_insts2 = [None for _ in range(number_of_sections)]
-    k= Signal(intbv(0)[8:])
-    y_i = [Signal(intbv(0)[20:])for _ in range(number_of_sections)]
+
+    #y_i = Signal[(intbv(0)[20:])for _ in range(number_of_sections)]
+    y_i = Signals(intbv(0)[20:], number_of_sections)
     yvector = ConcatSignal(*reversed(y_i))
-    xb = [Samples(k.min, k.max) for _ in range(number_of_sections+1)]  #added +1 otherwise out of bounds
-    xb[0] = x  #check why this is happening
-    
-    #xb[number_of_sections-1] = y
+    yout = y
 
-
-    for ii in range(len(b)):    #cehck if it should be +1 or nor
+    for ii in range(len(b)):    
         list_of_insts[ii] = filter_iir(
             glbl, x, y_i[ii],
             b=tuple(map(int, b[ii])),  a=tuple(map(int, a[ii])))
 
-    # for i in range (2):    #cehck if it should be +1 or nor
-    #     list_of_insts2[i] = summer(glbl, b, y_i[i] )
-    list_of_insts2 = summer(glbl, b, yvector)
+    insts = parallel_sum(glbl, b, yvector, yout)
 
-    return list_of_insts, list_of_insts2
+    return list_of_insts, insts
