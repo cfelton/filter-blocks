@@ -4,15 +4,7 @@ from myhdl import Signal, intbv, always_seq
 from filter_blocks.support import Samples, Signals
 
 @hdl.block
-<<<<<<< HEAD
 def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
-=======
-<<<<<<< HEAD
-def filter_fir(glbl, sigin,sigout, b, shared_multiplier=False):
-=======
-def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
->>>>>>> upstream/master
->>>>>>> master
     """Basic FIR direct-form I filter.
 
     Ports:
@@ -39,22 +31,6 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
     vmax = 2**(2*w[0])  # double width max and min
     vmin = -vmax
     ymin = -ymax
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    N=len(b)-1
-
-    # Locally reference the interface signals
-    clock, reset = glbl.clock, glbl.reset
-    xdv = sigin.valid
-    y, ydv = sigout.data, sigout.valid 
-    x = Signal(intbv(0, min=vmin, max=vmax))  
-    
-    # Delay elements, list-of-signals (double length for all)
-    ffd = Signals(intbv(0, min=ymin, max=ymax), N) 
-    yacc = Signal(intbv(0, min=vmin, max=vmax))   # verify the length of this 
-=======
->>>>>>> master
     N = len(b)-1
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
@@ -63,50 +39,17 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
     # Delay elements, list-of-signals
     ffd = Signals(intbv(0, min=ymin, max=ymax), N)
     yacc = Signal(intbv(0, min=vmin, max=vmax)) #verify the length of this
-<<<<<<< HEAD
-=======
->>>>>>> upstream/master
->>>>>>> master
     dvd = Signal(bool(0))
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
-<<<<<<< HEAD
         if sigin.valid:
             x.next = sigin.data
 
-=======
-<<<<<<< HEAD
-        #print(sigin.valid)
-        print(sigin.data)
-        if sigin.valid:
-            x.next=sigin.data
-            #print("hello from inside")
-            #print(sigin.data)
-=======
-        if sigin.valid:
-            x.next = sigin.data
-
->>>>>>> upstream/master
->>>>>>> master
             for i in range(N-1):
                 ffd[i+1].next = ffd[i]
 
             ffd[0].next = x
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            #multiplication doesnt work if b0*x
-            # sum-of-products loop
-            c = b[0]
-            sop = x*c
-            for ii in range(N):
-                c = b[ii+1]
-                sop = sop + (c * ffd[ii])
-
-            yacc.next =sop
-=======
->>>>>>> master
             # sum-of-products loop
             c = b[0]
             sop = x*c
@@ -116,26 +59,11 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
                 sop = sop + (c * ffd[ii])
             yacc.next = sop
             print(yacc)
-<<<<<<< HEAD
-=======
->>>>>>> upstream/master
->>>>>>> master
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
         y.next = yacc.signed()
         ydv.next = dvd
-<<<<<<< HEAD
 
     return beh_direct_form_one, beh_output
-=======
-<<<<<<< HEAD
-        print(yacc)
-
-    return beh_direct_form_one,beh_output
-=======
-
-    return beh_direct_form_one, beh_output
->>>>>>> upstream/master
->>>>>>> master

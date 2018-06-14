@@ -1,9 +1,13 @@
+
 """
 Simple IIR Filter
 =================
 The following is a straight forward HDL description of a
 direct-form-I IIR filter.  This module can be used to
 generate synthesizable Verilg/VHDL.
+
+
+
 :Author: Christopher Felton <chris.felton@gmail.com>
 """
 
@@ -15,13 +19,16 @@ from .support import Samples
 @hdl.block
 def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     """Basic IIR direct-form I filter.
+
     Ports:
         glbl (Global): global signals.
         sigin (SignalBus): input digital signal.
         sigout (SignalBus): output digitla signal.
+
     Args:
         b (tuple, list): numerator coefficents.
         a (tuple, list): denominator coefficents.
+
     Returns:
         inst (myhdl.Block, list):
     """
@@ -104,3 +111,4 @@ def filter_iir_sos(glbl, x, y, b, a, w):
         )
 
     return list_of_insts
+
