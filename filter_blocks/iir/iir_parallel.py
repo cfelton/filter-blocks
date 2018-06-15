@@ -50,6 +50,8 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     yacc = Signal(intbv(0, min=vmin, max=vmax))
     dvd = Signal(bool(0))
 
+    print(glbl.clock)
+
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
@@ -59,8 +61,8 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
             ffd[0].next = x
 
             fbd[1].next = fbd[0]
-            fbd[0].next = yacc[qd:q].signed()
-
+            fbd[0].next = yacc.signed()
+            print(fbd[0])
             
     @hdl.always_comb
     def beh_acc():
@@ -87,7 +89,7 @@ def parallel_sum(glbl, b, yin, yout):
     k= Signal(intbv(0)[8:])
     yout = Samples(k.min, k.max)
     
-    @hdl.always(clock.posedge)
+    @hdl.always_seq(clock.posedge, reset=reset)
     def output():
         yout.data = 0
         for ii in range(len(b)):
@@ -108,13 +110,12 @@ def filter_iir_parallel(glbl, x, y, b, a, w):
     #y_i = Signal[(intbv(0)[20:])for _ in range(number_of_sections)]
     y_i = Signals(intbv(0)[20:], number_of_sections)
     yvector = ConcatSignal(*reversed(y_i))
-    yout = y
 
     for ii in range(len(b)):    
         list_of_insts[ii] = filter_iir(
             glbl, x, y_i[ii],
             b=tuple(map(int, b[ii])),  a=tuple(map(int, a[ii])))
 
-    insts = parallel_sum(glbl, b, yvector, yout)
+    insts = parallel_sum(glbl, b, yvector, y)
 
     return list_of_insts, insts
