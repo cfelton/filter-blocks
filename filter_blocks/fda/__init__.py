@@ -1,3 +1,3 @@
 
 from .iir import FilterIIR
-from .fir_pyfda import FilterFIR
+from .fir_test import FilterFIR

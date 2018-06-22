@@ -20,9 +20,8 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
     """
     assert isinstance(sigin, Samples)
     assert isinstance(sigout, Samples)
-    assert isinstance(b, tuple)
+    #assert isinstance(b, tuple)
     # All the coefficients need to be an `int`
-
     rb = [isinstance(bb, int) for bb in b]
     assert all(rb)
 
