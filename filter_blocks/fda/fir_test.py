@@ -16,6 +16,7 @@ class FilterFIR(FilterHardware):
         self.n_cascades = 0
         self.direct_form_type = 1
         self.sigin = np.array([])
+        self.response = []
 
     def set_cascade(self, n_cascades):
         self.n_cascades = n_cascades
@@ -26,16 +27,22 @@ class FilterFIR(FilterHardware):
     def set_stimulation(self, sigin):
         self.sigin = sigin.tolist()
 
+    def get_response(self):
+        return self.response
+
     def runsim(self):
         pass
         
     @hdl.block
     def filter_block(self):
         # this elaboration code will select the different structure and implementations
-        x = Signal(intbv(0)[20:])
-        y = Signal(intbv(0)[20:])
-        xt = Samples(x.min, x.max)
-        yt = Samples(y.min, y.max)
+        # x = Signal(intbv(0)[20:])
+        # y = Signal(intbv(0)[20:])
+        w = (25,24,0)
+        ymax = 2**(w[0]-1)
+        vmax = 2**(2*w[0])
+        xt = Samples(-vmax, vmax)
+        yt = Samples(-vmax, vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
@@ -85,8 +92,9 @@ class FilterFIR(FilterHardware):
                 yt.valid = False
 
             print(yt.sample_buffer)
-            pl.plot(yt.sample_buffer)
-            pl.show()   
+            self.response = yt.sample_buffer
+            # pl.plot(yt.sample_buffer)
+            # pl.show()   
             
             raise StopSimulation()
     

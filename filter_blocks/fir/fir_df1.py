@@ -57,7 +57,7 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
                 c = b[ii+1]
                 sop = sop + (c * ffd[ii])
             yacc.next = sop
-            print(yacc)
+            #print(yacc)
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
