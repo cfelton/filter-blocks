@@ -8,34 +8,39 @@ from myhdl import Signal, intbv, StopSimulation
 
 
 class FilterFIR(FilterHardware):
-    def __init__(self, b, a):
-        super().__init__(b, a)
+    """Contains FIR filter parameters. Parent Class : FilterHArdware"""
+    def __init__(self, b = None, a = None, w = (24, 0, 23)):
+        """
+        Args:
+            b (list of int): list of numerator coefficients.
+            a (list of int): list of denominator coefficients. 
+            filter_type:
+            filter_form_type:
+            response(list): list of filter output in int format.
+        """
+        super(FilterFIR, self).__init__(b, a, w)
         self.filter_type = 'direct_form'
-        self.n_cascades = 0
         self.direct_form_type = 1
-        self.sigin = np.array([])
         self.response = []
 
-    def set_cascade(self, n_cascades):
-        self.n_cascades = n_cascades
-
-    def set_coefficients(self, coefficients):
-        self.b = coefficients
-
-    def set_stimulation(self, sigin):
-        self.sigin = sigin.tolist()
-
     def get_response(self):
+        """Return filter output.
+
+        returns:
+            response(numpy int array) : returns filter output as numpy array
+        """
         return self.response
 
     def runsim(self):
-        pass
+        """Run filter simulation"""
+
+        testfil = self.filter_block()
+        testfil.run_sim()
 
     @hdl.block
     def filter_block(self):
-        # this elaboration code will select the different structure and implementations
-        # x = Signal(intbv(0)[20:])
-        # y = Signal(intbv(0)[20:])
+        """ this elaboration code will select the different structure and implementations"""
+
         w = (25, 24, 0)
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
@@ -47,10 +52,10 @@ class FilterFIR(FilterHardware):
         glbl = Global(clock, reset)
         tbclk = clock.process()
         numsample = 0
-
-        for k in self.sigin:
-            numsample += 1
-
+        
+        # set numsample 
+        numsample = len(self.sigin)
+        #process to record output in buffer
         rec_insts = yt.process_record(clock, num_samples=numsample)
 
 
@@ -74,10 +79,9 @@ class FilterFIR(FilterHardware):
 
         @hdl.instance
         def stimulus():
-            "input for test bench taken from text file test.txt"
+            "record output in numpy array yt.sample_buffer"
             for k in self.sigin:
                 xt.data.next = int(k)
-                #print(k)
                 xt.valid = bool(1)
 
                 yt.record = True
