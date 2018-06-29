@@ -8,16 +8,16 @@ from myhdl import Signal, intbv, StopSimulation
 
 
 class FilterFIR(FilterHardware):
-    """Contains FIR filter parameters. Parent Class : FilterHArdware"""
-    def __init__(self, b = None, a = None, w = (24, 0, 23)):
-        """
+    """Contains FIR filter parameters. Parent Class : FilterHardware
         Args:
             b (list of int): list of numerator coefficients.
             a (list of int): list of denominator coefficients. 
+            word format (tuple of int): (W, WI, WF)
             filter_type:
             filter_form_type:
             response(list): list of filter output in int format.
         """
+    def __init__(self, b = None, a = None, w = (24, 0, 23)):
         super(FilterFIR, self).__init__(b, a, w)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
