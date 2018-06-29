@@ -2,7 +2,7 @@ import numpy as np
 
 class FilterHardware(object):
     """Top level class. Contains filter parameters."""
-    def __init__(self, b, a, w):
+    def __init__(self, b, a, w  = (24, 0, 23)):
         """
         Args:
             b (list of int): list of numerator coefficients.
