@@ -57,8 +57,8 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
 
     # Locally reference the interface signals
     clock, reset = glbl.clock, glbl.reset
-    x, xdv = sigin.data, sigin.data_valid
-    y, ydv = sigout.data, sigout.data_valid
+    x, xdv = sigin.data, sigin.valid
+    y, ydv = sigout.data, sigout.valid
 
     # Delay elements, list-of-signals (double length for all)
     ffd = [Signal(intbv(0, min=vmin, max=vmax)) for _ in range(2)]
@@ -87,14 +87,14 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
         y.next = yacc[qd:q].signed()
         ydv.next = dvd
 
-    # @todo add shared multiplier version ...
+    # TODO add shared multiplier version ...
 
     return hdl.instance()
 
 
 @hdl.block
 def filter_iir_sos(glbl, x, y, b, a, w):
-    """IIR sum of sections ...
+    """IIR sum of sections
     """
     assert len(b) == len(a)
     number_of_sections = len(b)

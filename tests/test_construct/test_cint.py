@@ -1,6 +1,7 @@
 
 import myhdl as hdl
 from myhdl import Signal, intbv, always_comb
+from myhdl.conversion import analyze_convert
 
 from filter_blocks.support import Clock, Signals
 from filter_blocks.construct import clock_domain
@@ -135,6 +136,7 @@ def test_construct_block_conversion():
     inst.config_sim()
     inst.convert()
     # TODO: this needs to be fixed, in myhdl base
+    
     # inst.analyze_convert()
     # inst.verify_convert()
 
