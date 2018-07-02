@@ -4,7 +4,7 @@ from filter_blocks.support import Samples, Signals
 
 
 @hdl.block
-def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
+def filter_iir(glbl, sigin, sigout, y_valid, b, a, shared_multiplier=False):
     """Parallel IIR filter.
 
     Ports:
@@ -41,6 +41,7 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     # Locally reference the interface signals
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
+    ydv = y_valid
     y = sigout
     x = Signal(intbv(0, min=vmin, max=vmax))
 
@@ -50,19 +51,18 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     yacc = Signal(intbv(0, min=vmin, max=vmax))
     dvd = Signal(bool(0))
 
-    print(glbl.clock)
 
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
         if sigin.valid:
-            x.next=sigin.data       
+            x.next=sigin.data
             ffd[1].next = ffd[0]
             ffd[0].next = x
 
             fbd[1].next = fbd[0]
             fbd[0].next = yacc.signed()
-            print(fbd[0])
+            #print(fbd[0])
             
     @hdl.always_comb
     def beh_acc():
@@ -75,13 +75,14 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     def beh_output():
         dvd.next = xdv
         y.next = yacc.signed()
+        ydv.next = dvd
 
     return beh_direct_form_one, beh_acc, beh_output
 
 
 
 @hdl.block
-def parallel_sum(glbl, b, yin, yout):
+def parallel_sum(glbl, b, y_len, y_valid, yin, yout):
 
     """sum of all the individial parallel outputs ...
     """
@@ -93,9 +94,10 @@ def parallel_sum(glbl, b, yin, yout):
     def output():
         yout.data = 0
         for ii in range(len(b)):
-            yout.data=yout.data+yin[(ii+1)*20:ii*20]
+            yout.data=yout.data+yin[(ii+1)*y_len:ii*y_len]
 
         print(yout.data)
+        #print(y_valid)
 
     return output
 
@@ -107,15 +109,28 @@ def filter_iir_parallel(glbl, x, y, b, a, w):
     number_of_sections = len(b)
     list_of_insts = [None for _ in range(number_of_sections)]
 
+    w = x.word_format
+    ymax = 2**(w[0]-1)
+    vmax = 2**(2*w[0])  # double width max and min
+    vmin = -vmax
+
     #y_i = Signal[(intbv(0)[20:])for _ in range(number_of_sections)]
-    y_i = Signals(intbv(0)[20:], number_of_sections)
+    y_i = Signals(intbv(0, min=vmin, max=vmax), number_of_sections)
+    y_valid = [Signal(bool(0)) for _ in range(number_of_sections)]
+    y_len = len(y_i[0])
+    
+    #for i in y_i:
+    #    print(y_i)
+    
     yvector = ConcatSignal(*reversed(y_i))
+    y_valid_vector = ConcatSignal(*reversed(y_valid))
 
     for ii in range(len(b)):    
         list_of_insts[ii] = filter_iir(
-            glbl, x, y_i[ii],
+            glbl, x, y_i[ii], y_valid[ii],
             b=tuple(map(int, b[ii])),  a=tuple(map(int, a[ii])))
 
-    insts = parallel_sum(glbl, b, yvector, y)
+    insts = parallel_sum(glbl, b, y_len, y_valid_vector, yvector, y)
+
 
     return list_of_insts, insts
