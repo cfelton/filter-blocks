@@ -2,8 +2,9 @@ import myhdl as hdl
 from filter_blocks.support import Samples
 from .filter_hw import FilterHardware
 from ..iir import iir_parallel
+from ..iir import iir_df1
 
-class FIRFilter(FilterHardware):
+class IIRFilter(FilterHardware):
     def __init__(self, b, a):
         super().__init__(b, a)
         self.filter_type = 'parallel_form'
@@ -32,6 +33,6 @@ class FIRFilter(FilterHardware):
                         glbl, sigin[ii], sigout[ii], b, a, w
                     )
             else:
-                filter_insts = dfilter(glbl, xt, yt, b, a, w)
+                filter_insts = iir_df1.filter_iir(glbl, xt, yt, b, a)
 
             return filter_insts
