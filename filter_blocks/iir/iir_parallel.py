@@ -19,7 +19,7 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
         inst (myhdl.Block, list):
     """
     assert isinstance(sigin, Samples)
-    #assert isinstance(sigout, Samples)
+    assert isinstance(sigout, Samples)
     assert isinstance(b, tuple)
     assert isinstance(a, tuple)
 

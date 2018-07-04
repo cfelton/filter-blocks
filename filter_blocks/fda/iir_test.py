@@ -13,6 +13,9 @@ class IIRFilter(FilterHardware):
 
     def set_cascade(self, n_cascades):
         self.n_cascades = n_cascades
+    
+    def set_filter_type(self, filter_type):
+        self.filter_type = filter_type
 
     @hdl.block
     def filter_block(self, glbl, sigin, sigout, b, a, w):
@@ -33,6 +36,10 @@ class IIRFilter(FilterHardware):
                         glbl, sigin[ii], sigout[ii], b, a, w
                     )
             else:
-                filter_insts = iir_df1.filter_iir(glbl, xt, yt, b, a)
+                filter_insts = iir_parallel.filter_iir_parallel(glbl, xt, yt, b, a, w)
 
-            return filter_insts
+        if self.filter_type == 'direct_form':
+            filter_insts = iir_df1.filter_iir(glbl, xt, yt, b, a)
+
+
+        return filter_insts

@@ -1,6 +1,5 @@
 import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
-
 from filter_blocks.support import Samples, Signals
 
 @hdl.block

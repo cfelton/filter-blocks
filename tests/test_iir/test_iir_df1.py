@@ -1,7 +1,6 @@
 import myhdl as hdl
 from myhdl import Signal, intbv, StopSimulation, traceSignals
 from filter_blocks.support import Clock, Reset, Global
-from filter_blocks.iir import iir_df1
 from filter_blocks.fda import iir_test as ft
 
 @hdl.block
@@ -12,10 +11,11 @@ def test_iir_df1():
     tbclk = clock.process()
     x = Signal(intbv(0)[8:])
     y = Signal(intbv(0)[8:])
-    a = (1,1)
+    a = (1, 1)
     b = (1, 2, 1)
     w = (24, 23, 0)
     iir_test = ft.IIRFilter(b, a)
+    iir_test.filter_type = 'direct_form'
     fir = iir_test.filter_block(glbl, x, y, b, a, w)
 
     @hdl.instance

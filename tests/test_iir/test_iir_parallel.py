@@ -21,7 +21,7 @@ def test_iir_parallel():
     a = [[0, 1],[0, 0]]
     w = (24,0)
 
-    iir_test = it.FIRFilter(b, a)
+    iir_test = it.IIRFilter(b, a)
     iir = iir_test.filter_block(glbl, x, y, b, a, w)
 
     @hdl.instance
