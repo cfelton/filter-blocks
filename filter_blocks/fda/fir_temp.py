@@ -31,7 +31,7 @@ class FilterFIR(FilterHardware):
         """
         return self.response
 
-    def runsim(self):
+    def run_sim(self):
         """Run filter simulation"""
 
         testfil = self.filter_block()

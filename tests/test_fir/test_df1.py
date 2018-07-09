@@ -8,6 +8,6 @@ def main():
     b = [1, 2, 3, 1]
     hdlfilter.set_coefficients(coeff_b = b)
     hdlfilter.set_stimulus(np.ones(100))
-    hdlfilter.runsim()
+    hdlfilter.run_sim()
 if __name__ == '__main__':
     main()
