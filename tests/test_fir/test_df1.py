@@ -5,10 +5,10 @@ def main():
     """Meant to emulate how pyfda will pass parameters to filters"""
 
     hdlfilter = FilterFIR()
-    b = (1, 2, 3, 1)
+    b = [1, 2, 3, 1]
     hdlfilter.set_coefficients(coeff_b = b)
     hdlfilter.set_stimulus(np.ones(100))
     hdlfilter.run_sim()
-    hdlfilter.convert()
+    hdlfilter.convert(name = 'hello')
 if __name__ == '__main__':
     main()

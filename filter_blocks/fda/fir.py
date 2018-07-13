@@ -36,7 +36,7 @@ class FilterFIR(FilterHardware):
         testfil = self.filter_block()
         testfil.run_sim()
 
-    def convert(self, path):
+    def convert(self, hdl='Verilog', **kwargs):
         """Convert the HDL description to Verilog and VHDL.
         """
         w = self.word_format
@@ -58,9 +58,7 @@ class FilterFIR(FilterHardware):
             fir = fir_hdl(glbl, sigin, sigout, self.b,
                           shared_multiplier=self._shared_multiplier)
             
-            fir.name = self.hdl_name
-            fir.directory = self.hdl_directory
-            fir.convert(hdl)
+            fir.convert(hdl='Verilog', **kwargs)
 
 
         clock = Clock(0, frequency=50e6)

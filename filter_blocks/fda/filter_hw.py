@@ -38,11 +38,12 @@ class FilterHardware(object):
         """Set filter coefficients.
 
         Args:
-            coefficients (list): list of filter coefficients
-            param2 (str): The second parameter.
+            coeff_b (list): list of numerator filter coefficients
+            coeff_a (list): list of denominator filter coefficients
         """
-        self.b = coeff_b
-        self.a = coeff_a
+        self.b = tuple(coeff_b)
+        if coeff_a is not None:
+            self.a = tuple(coeff_a)
 
     def set_stimulus(self, sigin):
         """Set filter stimulus
