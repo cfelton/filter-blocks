@@ -22,8 +22,8 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
     assert isinstance(sigout, Samples)
     #assert isinstance(b, tuple)
     # All the coefficients need to be an `int`
-    rb = [isinstance(bb, int) for bb in b]
-    assert all(rb)
+    #rb = [isinstance(bb, int) for bb in b]
+    #assert all(rb)
 
     w = sigin.word_format
     ymax = 2**(w[0]-1)

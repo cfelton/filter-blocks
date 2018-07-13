@@ -1,80 +1,102 @@
-"""
-"""
-
 import myhdl as hdl
-from myhdl import Signal, ResetSignal, intbv, always
-
-from filter_blocks import Clock, Reset, Samples
-from filter_blocks import filter_iir, filter_iir_sos
-
+import numpy as np
 from .filter_hw import FilterHardware
+from ..fir import fir_df1
+from filter_blocks.support import Clock, Reset, Global, Samples
+from myhdl import Signal, intbv, StopSimulation
+
 
 
 class FilterIIR(FilterHardware):
-    def __init__(self, b, a, sos=None):
-        """Configuration and analysis of a hardware digital filter.
-        """
-        super(FilterIIR, self).__init__(b, a)
-        self.n_sections = 1
-        self.convert_coefficients(b, a, sos)
-        self .iir_sections = [None for _ in range(self.n_sections)]
-        self.first_pass = True
-
-    def convert_coefficients(self, b, a, sos):
-        """Extract the coefficients and convert to fixed-point.
-        """
-        pass
-
-    def process(self, x):
-        for ii in range(self.n_sections):
-            x = self.iir_sections[ii].process(x)
-        y = x
-        return y
-
-    def get_filter_instance(self, glbl, sigin, sigout):
-        """Get the filter hardware instance.
-
+    """Contains IIR filter parameters. Parent Class : FilterHardware
         Args:
-            glbl: global signals like clock, reset, enable
-            sigin: input signal bus
-            sigout: output signal bus
-
-        Returns:
-            inst (myhdl.Block): an object that represents the
-               filter block.
-
+            b (list of int): list of numerator coefficients.
+            a (list of int): list of denominator coefficients. 
+            word format (tuple of int): (W, WI, WF)
+            filter_type:
+            filter_form_type:
+            response(list): list of filter output in int format.
         """
-        inst = None
-        if self.is_sos:
-            pass
-        else:
-            pass
+    def __init__(self, b = None, a = None, w = (24, 0, 23)):
+        super(FilterIIR, self).__init__(b, a, w)
+        self.filter_type = 'direct_form'
+        self.direct_form_type = 1
+        self.response = []
 
-        return inst
+    def get_response(self):
+        """Return filter output.
+
+        returns:
+            response(numpy int array) : returns filter output as numpy array
+        """
+        return self.response
+
+    def runsim(self):
+        """Run filter simulation"""
+
+        testfil = self.filter_block()
+        testfil.run_sim()
 
     @hdl.block
-    def filter_iir_top(self, clock, reset, x, xdv, y, ydv):
-        """Small top-level wrapper"""
-        w = (len(x), 0, len(x)-1)
-        sigin = Samples(word_format=w)
-        sigin.data, sigin.valid = x, xdv
-        sigout = Samples(word_format=w)
-        sigout.data, sigout.valid = y, ydv
+    def filter_block(self):
+        """ this elaboration code will select the different structure and implementations"""
 
-        return filter_inst
-
-    def convert(self, hdl='verilog'):
-        """Convert to verilog or vhdl"""
-        w = self.word_format
-        imax = 2**(w[0]-1)
+        w = (25, 24, 0)
+        ymax = 2**(w[0]-1)
+        vmax = 2**(2*w[0])
+        xt = Samples(-vmax, vmax)
+        yt = Samples(-vmax, vmax)
+        xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
-        reset = Reset(0, active=0, async=True)
-        x = Signal(intbv(0, min=-imax, max=imax))
-        y = Signal(intbv(0, min=-imax, max=imax))
-        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        reset = Reset(1, active=0, async=True)
+        glbl = Global(clock, reset)
+        tbclk = clock.process()
+        numsample = 0
+        
+        # set numsample 
+        numsample = len(self.sigin)
+        #process to record output in buffer
+        rec_insts = yt.process_record(clock, num_samples=numsample)
 
-        inst = self.filter_iir_top(clock, reset, x, xdv, y, ydv)
-        inst.name = self.hdl_name
-        inst.directory = self.hdl_directory
-        inst.convert(hdl=hdl)
 
+        if self.filter_type == 'direct_form':
+            if self.direct_form_type == 1:
+                # all filters will need the same interface ports, this should be do able
+                dfilter = fir_df1.filter_fir
+
+            if self.n_cascades > 0:
+                filter_insts = [None for _ in range(self.n_cascades)]
+                for ii in range(self.n_cascades):
+                    pass
+ #                   filter_insts[ii] = fir_df1.filter_fir(
+ #                       glbl, sigin[ii], sigout[ii], b
+ #                   )
+            else:
+                filter_insts = dfilter(glbl, xt, yt, self.b, self.word_format)
+
+
+
+
+        @hdl.instance
+        def stimulus():
+            "record output in numpy array yt.sample_buffer"
+            for k in self.sigin:
+                xt.data.next = int(k)
+                xt.valid = bool(1)
+
+                yt.record = True
+                yt.valid = True
+                yield clock.posedge
+                #Collect a sample from each filter
+                yt.record = False
+                yt.valid = False
+
+            print(yt.sample_buffer)
+            self.response = yt.sample_buffer
+            # pl.plot(yt.sample_buffer)
+            # pl.show()
+
+            raise StopSimulation()
+
+        return hdl.instances()
+         
