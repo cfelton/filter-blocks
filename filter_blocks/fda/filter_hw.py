@@ -2,12 +2,12 @@ import numpy as np
 
 class FilterHardware(object):
     """Top level class. Contains filter parameters."""
-    def __init__(self, b, a, w  = (24, 0, 23)):
+    def __init__(self, b, a, w ):
         """
         Args:
             b (list of int): list of numerator coefficients.
             a (list of int): list of denominator coefficients. 
-            word_format (tuple of int): word format (W,WI,WF).
+            coef_word_format (tuple of int): word format (W,WI,WF).
             n_cascades(int):
             sigin(numpy int array):
             nfft(int):
@@ -17,7 +17,7 @@ class FilterHardware(object):
         """
         self.b = b  # numerator coefficients
         self.a = a  # denominator coefficients
-        self.word_format = w
+        self.coef_word_format = w
 
         self.n_cascades = 0
         self.sigin = np.array([])
@@ -45,13 +45,15 @@ class FilterHardware(object):
         if coeff_a is not None:
             self.a = tuple(coeff_a)
 
-    def set_stimulus(self, sigin):
+    def set_stimulus(self, sigin, input_word_format = (24, 23, 0)):
         """Set filter stimulus
 
         Args:
             sigin (np array int): numpy array of filter stimulus 
+            bits (int) : no of bits
         """
         self.sigin = sigin.tolist()
+        self.input_word_format = input_word_format
     
     def set_cascade(self, n_cascades):
         """Set number of filter cascades
@@ -67,7 +69,7 @@ class FilterHardware(object):
         Args:
             word_format (tuple of int): word format (W,WI,WF)
         """
-        self.word_format = w
+        self.coef_word_format = w
 
     def get_fixed_coefficients(self):
         raise NotImplementedError

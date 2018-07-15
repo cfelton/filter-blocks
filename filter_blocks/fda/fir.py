@@ -16,7 +16,7 @@ class FilterFIR(FilterHardware):
             filter_form_type:
             response(list): list of filter output in int format.
         """
-    def __init__(self, b = None, a = None, w = (24, 0, 23)):
+    def __init__(self, b = None, a = None, w = (24,0,23)):
         super(FilterFIR, self).__init__(b, a, w)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
@@ -36,10 +36,11 @@ class FilterFIR(FilterHardware):
         testfil = self.filter_block()
         testfil.run_sim()
 
+
     def convert(self, hdl='Verilog', **kwargs):
         """Convert the HDL description to Verilog and VHDL.
         """
-        w = self.word_format
+        w = self.input_word_format
         imax = 2**(w[0]-1)
 
         # small top-level wrapper
@@ -82,10 +83,10 @@ class FilterFIR(FilterHardware):
     def filter_block(self):
         """ this elaboration code will select the different structure and implementations"""
 
-        w = (25, 24, 0)
+        w = self.input_word_format
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
-        xt = Samples(-vmax, vmax)
+        xt = Samples(-vmax, vmax, self.input_word_format)
         yt = Samples(-vmax, vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
@@ -113,7 +114,7 @@ class FilterFIR(FilterHardware):
  #                       glbl, sigin[ii], sigout[ii], b
  #                   )
             else:
-                filter_insts = dfilter(glbl, xt, yt, self.b, self.word_format)
+                filter_insts = dfilter(glbl, xt, yt, self.b, self.coef_word_format)
 
 
 

@@ -2,9 +2,10 @@ import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
 
 from filter_blocks.support import Samples, Signals
+import math
 
 @hdl.block
-def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
+def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     """Basic FIR direct-form I filter.
 
     Ports:
@@ -20,24 +21,30 @@ def filter_fir(glbl, sigin, sigout, b, shared_multiplier=False):
     """
     assert isinstance(sigin, Samples)
     assert isinstance(sigout, Samples)
-    #assert isinstance(b, tuple)
-    # All the coefficients need to be an `int`
-    #rb = [isinstance(bb, int) for bb in b]
-    #assert all(rb)
+    assert isinstance(b, tuple)
+    #All the coefficients need to be an `int`
+    rb = [isinstance(bb, int) for bb in b]
+    assert all(rb)
 
     w = sigin.word_format
     ymax = 2**(w[0]-1)
-    vmax = 2**(2*w[0])  # double width max and min
-    vmin = -vmax
-    ymin = -ymax
+    #vmax = 2**(2*w[0])  # double width max and min
+
     N = len(b)-1
+
+
+    acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
+    amax = 2**(2*acc_bits)
+
+
+
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min=vmin, max=vmax))
+    x = Signal(intbv(0, min = - ymax, max = ymax))
     # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=ymin, max=ymax), N)
-    yacc = Signal(intbv(0, min=vmin, max=vmax)) #verify the length of this
+    ffd = Signals(intbv(0, min = -ymax, max = ymax), N)
+    yacc = Signal(intbv(0, min = - amax, max = amax)) #verify the length of this
     dvd = Signal(bool(0))
 
     @hdl.always(clock.posedge)
