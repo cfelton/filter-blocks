@@ -15,8 +15,14 @@ class FilterHardware(object):
             hdl_directory(str):
             hdl_target(str):
         """
-        self.b = tuple(b)  # numerator coefficients
-        self.a = tuple(a)  # denominator coefficients
+        #numerator coefficient
+        if b is not None:
+            self.b = tuple(b)
+
+        # denominator coefficients
+        if a is not None:
+            self.a = tuple(a)
+        
         self.coef_word_format = w
 
         self.n_cascades = 0

@@ -14,7 +14,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
         sigout (SignalBus): output digitla signal.
 
     Args:
-        b (tuple, list): numerator coefficents.
+        b (tuple): numerator coefficents.
 
     Returns:
         inst (myhdl.Block, list):

@@ -31,7 +31,7 @@ class FilterIIR(FilterHardware):
         """
         return self.response
 
-    def runsim(self):
+    def run_sim(self):
         """Run filter simulation"""
 
         testfil = self.filter_block()
@@ -41,10 +41,11 @@ class FilterIIR(FilterHardware):
     def filter_block(self):
         """ this elaboration code will select the different structure and implementations"""
 
-        w = (25, 24, 0)
+
+        w = self.input_word_format
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
-        xt = Samples(-vmax, vmax)
+        xt = Samples(-ymax, ymax, self.input_word_format)
         yt = Samples(-vmax, vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
@@ -72,7 +73,7 @@ class FilterIIR(FilterHardware):
  #                       glbl, sigin[ii], sigout[ii], b
  #                   )
             else:
-                filter_insts = dfilter(glbl, xt, yt, self.b, self.word_format)
+                filter_insts = dfilter(glbl, xt, yt, self.b, self.a, self.coef_word_format)
 
 
 

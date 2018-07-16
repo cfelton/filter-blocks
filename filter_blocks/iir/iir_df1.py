@@ -3,7 +3,7 @@ from myhdl import Signal, intbv, always_seq
 from filter_blocks.support import Samples, Signals
 
 @hdl.block
-def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
+def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     """Basic FIR direct-form I filter.
 
     Ports:
@@ -12,7 +12,9 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
         sigout (SignalBus): output digitla signal.
 
     Args:
-        b (tuple, list): numerator coefficents.
+        b (tuple): numerator coefficents.
+        b (tuple): numerator coefficents.
+
 
     Returns:
         inst (myhdl.Block, list):
@@ -31,17 +33,18 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     w = sigin.word_format
     ymax = 2**(w[0]-1)
     vmax = 2**(2*w[0])  # double width max and min
-    vmin = -vmax
-    ymin = -ymax
+
+
     N = len(b)-1
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min=vmin, max=vmax))
+    x = Signal(intbv(0, min=-ymax, max=ymax))
+
     # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=ymin, max=ymax), N)
-    fbd = Signals(intbv(0, min=ymin, max=ymax), N)
-    yacc = Signal(intbv(0, min=vmin, max=vmax)) #verify the length of this
+    ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
     dvd = Signal(bool(0))
 
     @hdl.always(clock.posedge)
