@@ -2,7 +2,7 @@ import numpy as np
 
 class FilterHardware(object):
     """Top level class. Contains filter parameters."""
-    def __init__(self, b, a, w ):
+    def __init__(self, b, a, w):
         """
         Args:
             b (list of int): list of numerator coefficients.
@@ -15,8 +15,8 @@ class FilterHardware(object):
             hdl_directory(str):
             hdl_target(str):
         """
-        self.b = b  # numerator coefficients
-        self.a = a  # denominator coefficients
+        self.b = tuple(b)  # numerator coefficients
+        self.a = tuple(a)  # denominator coefficients
         self.coef_word_format = w
 
         self.n_cascades = 0

@@ -6,7 +6,7 @@ def main():
     coef = np.empty(100)
     coef.fill(8388607)
     hdlfilter = FilterFIR()
-    b = [1, 2, 3, 1, 0]
+    b = [8388607, 8388607, 1, 1, 1]
     hdlfilter.set_word_format((24, 23, 0))
     hdlfilter.set_coefficients(coeff_b = b)
     hdlfilter.set_stimulus(coef, (24,23,0))

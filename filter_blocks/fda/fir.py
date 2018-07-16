@@ -86,7 +86,7 @@ class FilterFIR(FilterHardware):
         w = self.input_word_format
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
-        xt = Samples(-vmax, vmax, self.input_word_format)
+        xt = Samples(-ymax, ymax, self.input_word_format)
         yt = Samples(-vmax, vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
