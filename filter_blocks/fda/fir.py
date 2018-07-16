@@ -56,7 +56,7 @@ class FilterFIR(FilterHardware):
             #choose appropriate filter
             fir_hdl = fir_df1.filter_fir
 
-            fir = fir_hdl(glbl, sigin, sigout, self.b,
+            fir = fir_hdl(glbl, sigin, sigout, self.b, self.coef_word_format,
                           shared_multiplier=self._shared_multiplier)
             
             fir.convert(hdl='Verilog', **kwargs)
@@ -84,6 +84,8 @@ class FilterFIR(FilterHardware):
         """ this elaboration code will select the different structure and implementations"""
 
         w = self.input_word_format
+        print(self.input_word_format)
+        print(self.coef_word_format)
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
         xt = Samples(-ymax, ymax, self.input_word_format)
