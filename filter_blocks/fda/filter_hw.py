@@ -51,7 +51,7 @@ class FilterHardware(object):
         if coeff_a is not None:
             self.a = tuple(coeff_a)
 
-    def set_stimulus(self, sigin, input_word_format = (24, 23, 0)):
+    def set_stimulus(self, sigin):
         """Set filter stimulus
 
         Args:
@@ -59,7 +59,6 @@ class FilterHardware(object):
             bits (int) : no of bits
         """
         self.sigin = sigin.tolist()
-        self.input_word_format = input_word_format
     
     def set_cascade(self, n_cascades):
         """Set number of filter cascades

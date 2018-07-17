@@ -84,8 +84,8 @@ class FilterFIR(FilterHardware):
         """ this elaboration code will select the different structure and implementations"""
 
         w = self.input_word_format
-        print(self.input_word_format)
-        print(self.coef_word_format)
+        #print(self.input_word_format)
+        #print(self.coef_word_format)
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
         xt = Samples(-ymax, ymax, self.input_word_format)
