@@ -16,8 +16,8 @@ class FilterFIR(FilterHardware):
             filter_form_type:
             response(list): list of filter output in int format.
         """
-    def __init__(self, b = None, a = None, w = (24,0,23)):
-        super(FilterFIR, self).__init__(b, a, w)
+    def __init__(self, b = None, a = None):
+        super(FilterFIR, self).__init__(b, a)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
         self.response = []
@@ -45,7 +45,7 @@ class FilterFIR(FilterHardware):
 
         # small top-level wrapper
         def filter_fir_top(hdl , clock, reset, x, xdv, y, ydv):
-            sigin = Samples(x.min, x.max)
+            sigin = Samples(x.min, x.max, self.input_word_format)
             sigin.data, sigin.data_valid = x, xdv
             sigout = Samples(y.min, y.max)
             sigout.data, sigout.data_valid = y, ydv
@@ -88,7 +88,7 @@ class FilterFIR(FilterHardware):
         #print(self.coef_word_format)
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
-        xt = Samples(-ymax, ymax, self.input_word_format)
+        xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
         yt = Samples(-vmax, vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)

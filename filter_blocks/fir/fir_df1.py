@@ -27,6 +27,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     assert all(rb)
 
     w = sigin.word_format
+    print(sigin.word_format)
     ymax = 2**(w[0]-1)
     #vmax = 2**(2*w[0])  # double width max and min
 
@@ -35,7 +36,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
 
     acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
     amax = 2**(acc_bits)
-    #print(acc_bits)
+    print(acc_bits)
 
 
     clock, reset = glbl.clock, glbl.reset

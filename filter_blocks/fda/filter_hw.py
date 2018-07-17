@@ -2,7 +2,7 @@ import numpy as np
 
 class FilterHardware(object):
     """Top level class. Contains filter parameters."""
-    def __init__(self, b, a, w):
+    def __init__(self, b, a):
         """
         Args:
             b (list of int): list of numerator coefficients.
@@ -23,7 +23,6 @@ class FilterHardware(object):
         if a is not None:
             self.a = tuple(a)
         
-        self.coef_word_format = w
 
         self.n_cascades = 0
         self.sigin = np.array([])
