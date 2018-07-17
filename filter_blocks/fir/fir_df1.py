@@ -10,8 +10,8 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
 
     Ports:
         glbl (Global): global signals.
-        sigin (SignalBus): input digital signal.
-        sigout (SignalBus): output digitla signal.
+        sigin (Samples): input digital signal.
+        sigout (Samples): output digitla signal.
 
     Args:
         b (tuple): numerator coefficents.
@@ -34,7 +34,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
 
 
     acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
-    amax = 2**(2*acc_bits)
+    amax = 2**(acc_bits)
     print(acc_bits)
 
 

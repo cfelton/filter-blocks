@@ -3,7 +3,7 @@ import numpy as np
 from .filter_hw import FilterHardware
 from ..fir import fir_df1
 from filter_blocks.support import Clock, Reset, Global, Samples
-from myhdl import Signal, intbv, StopSimulation, toVerilog, toVHDL
+from myhdl import Signal, intbv, StopSimulation
 
 
 class FilterFIR(FilterHardware):
@@ -37,7 +37,7 @@ class FilterFIR(FilterHardware):
         testfil.run_sim()
 
 
-    def convert(self, hdl='Verilog', **kwargs):
+    def convert(self, **kwargs):
         """Convert the HDL description to Verilog and VHDL.
         """
         w = self.input_word_format
@@ -59,7 +59,7 @@ class FilterFIR(FilterHardware):
             fir = fir_hdl(glbl, sigin, sigout, self.b, self.coef_word_format,
                           shared_multiplier=self._shared_multiplier)
             
-            fir.convert(hdl='Verilog', **kwargs)
+            fir.convert(**kwargs)
 
 
         clock = Clock(0, frequency=50e6)
@@ -70,10 +70,10 @@ class FilterFIR(FilterHardware):
         
 
         if self.hdl_target.lower() == 'verilog':
-            filter_fir_top('verilog', clock, reset, x, xdv, y, ydv)
+            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
  
         elif self.hdl_target.lower() == 'vhdl':
-            filter_fir_top('verilog', clock, reset, x, xdv, y, ydv)
+            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
         else:
             raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
 

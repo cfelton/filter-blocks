@@ -7,11 +7,10 @@ def main():
     coef.fill(8388607)
     hdlfilter = FilterFIR()
     b = [8388607, 8388607, 1, 1, 1]
-    
     hdlfilter.set_coefficients(coeff_b = b)
-    hdlfilter.set_word_format((25, 24, 0),(24,23,0))
-    #hdlfilter.set_stimulus(coef, (24,23,0))
+    hdlfilter.set_word_format((26, 24, 0),(28,23,0))
+    hdlfilter.set_stimulus(coef)
     hdlfilter.run_sim()
-    hdlfilter.convert()
+    hdlfilter.convert(hdl = 'vhdl')
 if __name__ == '__main__':
     main()
