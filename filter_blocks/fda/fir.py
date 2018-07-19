@@ -41,13 +41,15 @@ class FilterFIR(FilterHardware):
         """Convert the HDL description to Verilog and VHDL.
         """
         w = self.input_word_format
+        w_out = self.output_word_format
+        omax = 2**(w_out[0]-1)
         imax = 2**(w[0]-1)
 
         # small top-level wrapper
         def filter_fir_top(hdl , clock, reset, x, xdv, y, ydv):
             sigin = Samples(x.min, x.max, self.input_word_format)
             sigin.data, sigin.data_valid = x, xdv
-            sigout = Samples(y.min, y.max)
+            sigout = Samples(y.min, y.max, self.output_word_format)
             sigout.data, sigout.data_valid = y, ydv
             clk = clock
             rst = reset
@@ -65,7 +67,7 @@ class FilterFIR(FilterHardware):
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
         x = Signal(intbv(0, min=-imax, max=imax))
-        y = Signal(intbv(0, min=-imax, max=imax))
+        y = Signal(intbv(0, min=-omax, max=omax))
         xdv, ydv = Signal(bool(0)), Signal(bool(0))
         
 
@@ -84,12 +86,15 @@ class FilterFIR(FilterHardware):
         """ this elaboration code will select the different structure and implementations"""
 
         w = self.input_word_format
+        w_out = self.output_word_format
         #print(self.input_word_format)
         #print(self.coef_word_format)
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
+        omax = 2**(w_out[0]-1)
         xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
-        yt = Samples(-vmax, vmax)
+        yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
+        #yt = Samples(min=-vmax, max=vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)

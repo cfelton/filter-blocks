@@ -27,7 +27,11 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     assert all(rb)
 
     w = sigin.word_format
-    print(sigin.word_format)
+    w_out = sigout.word_format
+
+    #print(sigin.word_format)
+    #print(sigout.word_format)
+
     ymax = 2**(w[0]-1)
     #vmax = 2**(2*w[0])  # double width max and min
 
@@ -36,9 +40,13 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
 
     acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
     amax = 2**(acc_bits)
-    print(acc_bits)
+    
+    #print(acc_bits)
 
+    qd = acc_bits
+    q = acc_bits-w_out[0]
 
+    #print(qd-q)
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
@@ -70,7 +78,8 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-        y.next = yacc.signed()
+        y.next = yacc[qd:q].signed()
+        #y.next = yacc.signed()
         ydv.next = dvd
 
     return beh_direct_form_one, beh_output

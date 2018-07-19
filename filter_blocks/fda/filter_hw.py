@@ -67,15 +67,17 @@ class FilterHardware(object):
         """
         self.n_cascades = n_cascades
 
-    def set_word_format(self, coeff_w, input_w):
+    def set_word_format(self, coeff_w, input_w, output_w = (24,23,0)):
         """Set word format
 
         Args:
             coef_word_format (tuple of int): word format (W,WI,WF)
             input_word_format (tuple of int): word format (W,WI,WF)
+            output_word_format (tuple of int): word format (W,WI,WF)
         """
         self.coef_word_format = coeff_w
         self.input_word_format = input_w
+        self.output_word_format = output_w
 
     def get_fixed_coefficients(self):
         raise NotImplementedError
