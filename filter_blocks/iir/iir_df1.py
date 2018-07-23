@@ -1,6 +1,7 @@
 import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
 from filter_blocks.support import Samples, Signals
+import math
 
 @hdl.block
 def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
@@ -31,6 +32,8 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     assert all(ra)
 
     w = sigin.word_format
+    w_out = sigout.word_format
+    
     ymax = 2**(w[0]-1)
     vmax = 2**(2*w[0])  # double width max and min
 

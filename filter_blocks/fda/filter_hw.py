@@ -57,7 +57,9 @@ class FilterHardware(object):
             sigin (np array int): numpy array of filter stimulus 
             bits (int) : no of bits
         """
+
         self.sigin = sigin.tolist()
+
     
     def set_cascade(self, n_cascades):
         """Set number of filter cascades

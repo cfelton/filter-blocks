@@ -1,6 +1,5 @@
 import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
-
 from filter_blocks.support import Samples, Signals
 import math
 
@@ -46,6 +45,9 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     qd = acc_bits
     q = acc_bits-w_out[0]
 
+    if q<0:
+        q=0
+
     #print(qd-q)
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
@@ -79,6 +81,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     def beh_output():
         dvd.next = xdv
         y.next = yacc[qd:q].signed()
+        #print(y)
         #y.next = yacc.signed()
         ydv.next = dvd
 

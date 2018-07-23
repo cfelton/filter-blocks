@@ -1,10 +1,9 @@
 import myhdl as hdl
 import numpy as np
 from .filter_hw import FilterHardware
-from ..fir import fir_df1
+from ..iir import iir_df1
 from filter_blocks.support import Clock, Reset, Global, Samples
 from myhdl import Signal, intbv, StopSimulation
-
 
 
 class FilterIIR(FilterHardware):
@@ -17,8 +16,8 @@ class FilterIIR(FilterHardware):
             filter_form_type:
             response(list): list of filter output in int format.
         """
-    def __init__(self, b = None, a = None, w = (24, 0, 23)):
-        super(FilterIIR, self).__init__(b, a, w)
+    def __init__(self, b = None, a = None):
+        super(FilterIIR, self).__init__(b, a)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
         self.response = []
@@ -41,12 +40,14 @@ class FilterIIR(FilterHardware):
     def filter_block(self):
         """ this elaboration code will select the different structure and implementations"""
 
-
         w = self.input_word_format
+        w_out = self.output_word_format
+        
         ymax = 2**(w[0]-1)
         vmax = 2**(2*w[0])
-        xt = Samples(-ymax, ymax, self.input_word_format)
-        yt = Samples(-vmax, vmax)
+        omax = 2**(w_out[0]-1)
+        xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
+        yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
@@ -63,7 +64,7 @@ class FilterIIR(FilterHardware):
         if self.filter_type == 'direct_form':
             if self.direct_form_type == 1:
                 # all filters will need the same interface ports, this should be do able
-                dfilter = fir_df1.filter_fir
+                dfilter = iir_df1.filter_iir
 
             if self.n_cascades > 0:
                 filter_insts = [None for _ in range(self.n_cascades)]
