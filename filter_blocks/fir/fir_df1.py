@@ -29,7 +29,8 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     w_out = sigout.word_format
 
     #print(sigin.word_format)
-    #print(sigout.word_format)
+    print(sigout.word_format)
+
 
     ymax = 2**(w[0]-1)
     #vmax = 2**(2*w[0])  # double width max and min
@@ -37,7 +38,11 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     N = len(b)-1
 
 
-    acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
+    sum_abs_b = (sum([abs(x) for x in b]))/2**coef_w[0]
+    #acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
+    #print(w[0] + coef_w[0] + int(math.log(N, 2)))
+    print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
+    acc_bits = w[0] + coef_w[0] + int(math.log(sum_abs_b, 2))
     amax = 2**(acc_bits)
     
     #print(acc_bits)

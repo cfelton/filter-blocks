@@ -24,6 +24,8 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     assert isinstance(sigout, Samples)
     assert isinstance(b, tuple)
     assert isinstance(a, tuple)
+
+
     # All the coefficients need to be an `int`
 
     rb = [isinstance(bb, int) for bb in b]
@@ -37,6 +39,14 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     ymax = 2**(w[0]-1)
     vmax = 2**(2*w[0])  # double width max and min
 
+    q, qd = w[0], 2*w[0]
+
+    od = 2*w[0]
+    o = 2*w[0]-w_out[0]
+
+    if o<0:
+        o=0
+
 
     N = len(b)-1
     clock, reset = glbl.clock, glbl.reset
@@ -45,8 +55,8 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     x = Signal(intbv(0, min=-ymax, max=ymax))
 
     # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
-    fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    ffd = Signals(intbv(0, min=-ymax, max=vmax), N)
+    fbd = Signals(intbv(0, min=-ymax, max=vmax), N)
     yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
     dvd = Signal(bool(0))
 
@@ -60,22 +70,24 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
                 fbd[i+1].next = fbd[i]
 
             ffd[0].next = x
-            fbd[0].next = yacc.signed()
+            fbd[0].next = yacc[qd:q].signed()
             # sum-of-products loop
             c = b[0]
             sop = x*c
 
             for ii in range(N):
                 c = b[ii+1] #first element in list in b0
-                d = a[ii] #first element in list is a1
+                d = a[ii+1] #first element in list is a1
                 sop = sop + (c * ffd[ii]) - (d * fbd[ii])
             yacc.next = sop
-            print(yacc)
+            #print(yacc)
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-        y.next = yacc.signed()
+        y.next = yacc[od:o].signed()
+        #y.next = yacc.signed()
+        #print(y)
         ydv.next = dvd
 
     return beh_direct_form_one, beh_output

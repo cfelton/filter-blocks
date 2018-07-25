@@ -34,7 +34,50 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
+        testfil.config_sim(trace=True)
         testfil.run_sim()
+
+    def convert(self, **kwargs):
+        """Convert the HDL description to Verilog and VHDL.
+        """
+        w = self.input_word_format
+        w_out = self.output_word_format
+        omax = 2**(w_out[0]-1)
+        imax = 2**(w[0]-1)
+
+        # small top-level wrapper
+        def filter_iir_top(hdl , clock, reset, x, xdv, y, ydv):
+            sigin = Samples(x.min, x.max, self.input_word_format)
+            sigin.data, sigin.data_valid = x, xdv
+            sigout = Samples(y.min, y.max, self.output_word_format)
+            sigout.data, sigout.data_valid = y, ydv
+            clk = clock
+            rst = reset
+            glbl = Global(clk, rst)
+            
+            #choose appropriate filter
+            iir_hdl = iir_df1.filter_iir
+
+            iir = iir_hdl(glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
+                          shared_multiplier=self._shared_multiplier)
+            
+            iir.convert(**kwargs)
+
+
+        clock = Clock(0, frequency=50e6)
+        reset = Reset(1, active=0, async=True)
+        x = Signal(intbv(0, min=-imax, max=imax))
+        y = Signal(intbv(0, min=-omax, max=omax))
+        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        
+
+        if self.hdl_target.lower() == 'verilog':
+            filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
+ 
+        elif self.hdl_target.lower() == 'vhdl':
+            filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
+        else:
+            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
 
     @hdl.block
     def filter_block(self):
