@@ -55,8 +55,8 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     x = Signal(intbv(0, min=-ymax, max=ymax))
 
     # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=-ymax, max=vmax), N)
-    fbd = Signals(intbv(0, min=-ymax, max=vmax), N)
+    ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
     yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
     dvd = Signal(bool(0))
 

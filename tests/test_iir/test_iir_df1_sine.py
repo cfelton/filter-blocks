@@ -29,7 +29,7 @@ def fixp_sine(bsc_int, asc_int, B1, L1):
 
     yout = np.divide(y,2**B1)
     print(yout)
-    #hdlfilter.convert(hdl = 'VHDL')
+    hdlfilter.convert(hdl = 'verilog')
     plt.plot(yout, 'b')
     plt.show()
 

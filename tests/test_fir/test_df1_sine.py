@@ -21,7 +21,7 @@ def fixp_sine(bsc_int, B1, L1):
 
     hdlfilter = FilterFIR()
     hdlfilter.set_coefficients(coeff_b = bsc_int)
-    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(1000 , 999, 0))
+    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(31 , 30, 0))
     hdlfilter.set_stimulus(sig)
     hdlfilter.run_sim()
     y = hdlfilter.get_response()
@@ -59,14 +59,14 @@ def edge(B1, L1):
     y = hdlfilter.get_response()
 
     # yout = np.divide(y,2**L1)
-    # hdlfilter.convert(hdl = 'VHDL')
+     hdlfilter.convert(hdl = 'verilog')
     # plt.plot(yout, 'b')
     # plt.show()
 
     return y
 
 
-def floatp_sine(b, L1):
+def floatp(b, L1):
 
     x=20
     sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,x,1)]
