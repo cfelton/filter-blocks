@@ -34,7 +34,7 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        testfil.config_sim(trace=True)
+        #testfil.config_sim(trace=True)
         testfil.run_sim()
 
     def convert(self, **kwargs):
