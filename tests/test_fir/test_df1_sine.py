@@ -59,14 +59,14 @@ def edge(B1, L1):
     y = hdlfilter.get_response()
 
     # yout = np.divide(y,2**L1)
-     hdlfilter.convert(hdl = 'verilog')
+    hdlfilter.convert(hdl = 'verilog')
     # plt.plot(yout, 'b')
     # plt.show()
 
     return y
 
 
-def floatp(b, L1):
+def floatp_sine(b, L1):
 
     x=20
     sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,x,1)]
