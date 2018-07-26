@@ -38,7 +38,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     N = len(b)-1
 
 
-    sum_abs_b = (sum([abs(x) for x in b]))/2**coef_w[0]
+    sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
     #acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
     #print(w[0] + coef_w[0] + int(math.log(N, 2)))
     print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
