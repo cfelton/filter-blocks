@@ -29,7 +29,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     w_out = sigout.word_format
 
     #print(sigin.word_format)
-    print(sigout.word_format)
+    #print(sigout.word_format)
 
 
     ymax = 2**(w[0]-1)
@@ -41,19 +41,23 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
     #acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
     #print(w[0] + coef_w[0] + int(math.log(N, 2)))
-    print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
-    acc_bits = w[0] + coef_w[0] + int(math.log(sum_abs_b, 2))
-    amax = 2**(acc_bits)
+    #print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
+    print(w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2)))
+    acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
+    amax = 2**(acc_bits-1)
     
     #print(acc_bits)
 
     qd = acc_bits
     q = acc_bits-w_out[0]
 
+    print(qd)
+    print(q)
+
     if q<0:
         q=0
 
-    #print(qd-q)
+    print(qd-q)
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid

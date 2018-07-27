@@ -22,7 +22,7 @@ def fixp_sine(bsc_int, asc_int, B1, L1):
 
     hdlfilter = FilterIIR()
     hdlfilter.set_coefficients(coeff_b = bsc_int, coeff_a= asc_int)
-    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(1000 , 999 , 0))
+    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(10 , 999 , 0))
     hdlfilter.set_stimulus(sig)
     hdlfilter.run_sim()
     y = hdlfilter.get_response()
