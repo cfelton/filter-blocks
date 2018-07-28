@@ -38,12 +38,14 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     
     ymax = 2**(w[0]-1)
     vmax = 2**(2*w[0])  # top bit is guard bit
+    amax = 2**(2*w[0]-1) #max without guard bit. Value at which output will saturate  
+    #print(2**(2*w[0]-1))
 
     q, qd = w[0], 2*w[0]   #guard bit not fed back
 
     o, od = 2*w[0]-w_out[0], 2*w[0]      # guard bit not passed to output
 
-    print("od-o",od-o)
+    #print("od-o",od-o)
 
     if o<0:
         o=0
@@ -60,7 +62,9 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
     yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
     dvd = Signal(bool(0))
-    print(len(yacc))
+    overflow = Signal(bool(0))
+    underflow = Signal(bool(0))
+    #print(len(yacc))
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
@@ -82,24 +86,53 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
                 d = a[ii+1] #first element in list is a1
                 sop = sop + (c * ffd[ii]) - (d * fbd[ii])
             #yacc.next = sop    # from the earlier implementation without saturation
-
             if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
                 yacc.next = sop
-            elif yacc[qd]==1 and yacc[qd-1]==0:
-                print('underflow')
-                yacc.next = yacc.min
-            elif yacc[qd]==0 and yacc[qd-1]==1:
-                print('overflow')
-                yacc.next = yacc.max-1
 
-            #print("yacc" , yacc)
+            elif yacc[qd+1]==1 and yacc[qd]==0:
+                #print('underflow') # and change y as well
+                yacc.next == -amax
+
+            elif yacc[qd]==0 and yacc[qd-1]==1:
+                #print('overflow')
+                yacc.next == amax-1
+
+        print("yacc" , yacc)
+
+
+    @hdl.always_comb
+    def beh_acc():
+
+        if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
+            #y.next = yacc[od+1:o].signed()
+            #ydv.next = dvd
+            pass
+        elif yacc[qd+1]==1 and yacc[qd]==0:
+            #print('underflow2') # and change y as well
+            underflow.next = bool(1)
+
+        elif yacc[qd]==0 and yacc[qd-1]==1:
+            #print('overflow2')
+            overflow.next = bool(1)
+
+        #print("yacc" , yacc)
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-        y.next = yacc[od+1:o].signed() #without the +1 to od the saturation doesn't work. rest unaafected
-        #y.next = yacc.signed()
-        #print("y" , y)
-        ydv.next = dvd
+        if overflow == 1 :
+            y.next = amax-1
+            ydv.next = dvd
+            overflow.next == bool(0)
+        elif underflow == 1:
+            y.next = -amax
+            ydv.next = dvd
+            underflow.next == bool(0)
+        else:
+            y.next = yacc[od:o].signed()
+            y.next = yacc.signed()
+            ydv.next = dvd
 
-    return beh_direct_form_one, beh_output
+        #print("y" , y)
+
+    return hdl.instances()

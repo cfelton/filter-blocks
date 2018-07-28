@@ -80,6 +80,7 @@ def test_filters(args=None):
 
                 for sr in rlist:
                     sr.record = False
+                    
 
             yield delay(1100)
             raise hdl.StopSimulation

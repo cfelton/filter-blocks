@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def main():
     """Meant to emulate how pyfda will pass parameters to filters"""
     stim = np.empty(15)
-    stim.fill(-8388607)
+    stim.fill(8388607)
     hdlfilter = FilterIIR()
     b = [8388607, 8388607, 8388607]
     a = [1,2,1]
