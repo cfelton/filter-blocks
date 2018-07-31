@@ -130,7 +130,7 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
             underflow.next == bool(0)
         else:
             y.next = yacc[od:o].signed()
-            y.next = yacc.signed()
+            #y.next = yacc.signed()
             ydv.next = dvd
 
         #print("y" , y)
