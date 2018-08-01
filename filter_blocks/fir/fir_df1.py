@@ -43,7 +43,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     #print(w[0] + coef_w[0] + int(math.log(N, 2)))
     #print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
     print(w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2)))
-    acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
+    acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2)) -1
     amax = 2**(acc_bits-1)
     
     #print(acc_bits)
