@@ -110,12 +110,8 @@ class FilterIIR(FilterHardware):
                 dfilter = iir_df1.filter_iir
 
             if self.n_cascades > 0:
-                filter_insts = [None for _ in range(self.n_cascades)]
-                for ii in range(self.n_cascades):
-                    pass
- #                   filter_insts[ii] = fir_df1.filter_fir(
- #                       glbl, sigin[ii], sigout[ii], b
- #                   )
+                filter_insts = iir_sos.filter_iir_sos(glbl, xt, yt, self.b, self.a, self.coef_word_format)
+         
             else:
                 filter_insts = dfilter(glbl, xt, yt, self.b, self.a, self.coef_word_format)
 
@@ -136,7 +132,7 @@ class FilterIIR(FilterHardware):
                 yt.record = False
                 yt.valid = False
 
-            print(yt.sample_buffer)
+            #print(yt.sample_buffer)
             self.response = yt.sample_buffer
             # pl.plot(yt.sample_buffer)
             # pl.show()

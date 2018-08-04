@@ -55,21 +55,22 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min=-ymax, max=ymax))
+    x, xdv = sigin.data, sigin.valid
 
-    # Delay elements, list-of-signals
+    #Delay elements, list-of-signals
     ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
     fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
     yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
+
+
     dvd = Signal(bool(0))
-    overflow = Signal(bool(0))
-    underflow = Signal(bool(0))
+
     #print(len(yacc))
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
         if sigin.valid:
-            x.next = sigin.data
+            #print(x)
 
             for i in range(N-1):
                 ffd[i+1].next = ffd[i]
@@ -77,60 +78,40 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
 
             ffd[0].next = x
             fbd[0].next = yacc[qd:q].signed()
-            # sum-of-products loop
-            c = b[0]
-            sop = x*c
-
-            for ii in range(N):
-                c = b[ii+1] #first element in list in b0
-                d = a[ii+1] #first element in list is a1
-                sop = sop + (c * ffd[ii]) - (d * fbd[ii])
-            #yacc.next = sop    # from the earlier implementation without saturation
-            if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
-                yacc.next = sop
-
-            elif yacc[qd+1]==1 and yacc[qd]==0:
-                #print('underflow') # and change y as well
-                yacc.next == -amax
-
-            elif yacc[qd]==0 and yacc[qd-1]==1:
-                #print('overflow')
-                yacc.next == amax-1
-
-        print("yacc" , yacc)
 
 
     @hdl.always_comb
     def beh_acc():
+        c = b[0]
+        sop = x*c
 
-        if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
-            #y.next = yacc[od+1:o].signed()
-            #ydv.next = dvd
-            pass
-        elif yacc[qd+1]==1 and yacc[qd]==0:
-            #print('underflow2') # and change y as well
-            underflow.next = bool(1)
+        for ii in range(N):
+            c = b[ii+1] #first element in list in b0
+            d = a[ii+1] #first element in list is a0 =1
+            sop = sop + (c * ffd[ii]) - (d * fbd[ii])
 
-        elif yacc[qd]==0 and yacc[qd-1]==1:
-            #print('overflow2')
-            overflow.next = bool(1)
+        yacc.next = sop
 
-        #print("yacc" , yacc)
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-        if overflow == 1 :
-            y.next = amax-1
+        #y.next = yacc[od:o].signed()
+
+
+        if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
             ydv.next = dvd
-            overflow.next == bool(0)
-        elif underflow == 1:
+            y.next = yacc[od:o].signed()
+            
+        elif yacc[qd+1]==1 and yacc[qd]==0:
+            #print('underflow2') 
             y.next = -amax
             ydv.next = dvd
-            underflow.next == bool(0)
-        else:
-            y.next = yacc[od:o].signed()
-            #y.next = yacc.signed()
+
+
+        elif yacc[qd]==0 and yacc[qd-1]==1:
+            #print('overflow2')
+            y.next = amax-1
             ydv.next = dvd
 
         #print("y" , y)
