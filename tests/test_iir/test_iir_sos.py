@@ -1,104 +1,56 @@
-from filter_blocks.fda import FilterIIR
+
 import numpy as np
 import scipy.signal as signal
 import math
 import matplotlib.pyplot as plt
 
+from filter_blocks.fda import FilterIIR
 
 
-def fixp_sine(bsc_int, asc_int, B1, L1):
+def fixp_sine(sos_asc_int, B1, L1):
 
-    N=20
-    sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,N,1)]
+    sig = signal.unit_impulse(10)
 
-    B2 = 12 # Number of bits
-    L2 = math.floor(math.log((2**(B2-1)-1)/max(sig), 2))  # Round towards zero to avoid overflow
+    B2 = 12  # Number of bits
+    L2 = math.floor(math.log((2 ** (B2 - 1) - 1) / max(sig), 2))  # Round towards zero to avoid overflow
 
-    sig = np.multiply(sig, 2**L2)
+    sig = np.multiply(sig, 2 ** L2)
     sig = sig.round()
     sig = sig.astype(int)
     print(sig)
 
-
     hdlfilter = FilterIIR()
-    hdlfilter.set_coefficients(coeff_b = bsc_int, coeff_a= asc_int)
-    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(10 , 999 , 0))
+    hdlfilter.set_coefficients(sos = sos_asc_int)
+    hdlfilter.set_cascade(3)
+    hdlfilter.set_word_format((B1, B1 - 1, 0), (B2, B2 - 1, 0), (1000, 39, 0))
     hdlfilter.set_stimulus(sig)
     hdlfilter.run_sim()
     y = hdlfilter.get_response()
 
-    yout = np.divide(y,2**B1)
-    print(yout)
-    hdlfilter.convert(hdl = 'verilog')
-    plt.plot(yout, 'b')
-    plt.show()
-
-    return yout
-
-
-def edge(B1, L1):
-
-
-    B2 = 12
-    N = 10 # number of coefficients
-
-    max_coef = 2**(B1-1)-1 
-    min_coef = -2**(B1-1)
-
-    b_max = [max_coef] * N
-
-    max_in = 2**(B2-1)-1
-    min_in = -2**(B2-1)
-
-    coef = np.empty(100)
-    coef.fill(max_in)
-
-    hdlfilter = FilterFIR()
-    hdlfilter.set_coefficients(coeff_b = b_max)
-    hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1, 0),(40, 39, 0))
-    hdlfilter.set_stimulus(coef)
-    hdlfilter.run_sim()
-    y = hdlfilter.get_response()
-
-    # yout = np.divide(y,2**L1)
-    # hdlfilter.convert(hdl = 'VHDL')
-    # plt.plot(yout, 'b')
-    # plt.show()
+    #yout = np.divide(y, 2 ** B1)
+    print(y)
 
     return y
 
 
-def floatp_sine(b, a, B1, L1):
+def floatp_sine(sos, B1, L1):
 
-    x=20
-    sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,x,1)]
-    #print(sig)
+    # sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,x,1)]
+    sig = signal.unit_impulse(10)
+    # print(sig)
 
-
-    B2 = 12 # Number of bits
-    L2 = math.floor(math.log((2**(B2-1)-1)/max(sig), 2))  # Round towards zero to avoid overflow
-    #print(L)
-    sig = np.multiply(sig, 2**L2)
+    B2 = 12  # Number of bits
+    L2 = math.floor(math.log((2 ** (B2 - 1) - 1) / max(sig), 2))  # Round towards zero to avoid overflow
+    # print(L)
+    sig = np.multiply(sig, 2 ** L2)
     sig = sig.round()
     sig = sig.astype(int)
 
-    y = []
-    w = []
-    N = len(b)
+    y_sos = signal.sosfilt(sos, sig)
 
-    for n in range(N,len(sig)):
-        sop = 0
-        for i in range(N):
-            sop = sop + sig[n-i]*b[i] 
-        w.append(sop)
-
-    for n in range(N,len(sig)):
-        sop = 0
-        for i in range(N):
-            sop = w[n] - w[n-i]*a[i] 
-        w.append(sop)
+    print(y_sos)
     
-    return y
+    return y_sos
 
 
 
@@ -120,42 +72,34 @@ def main():
     #convert floating point to fixed point 
 
 
-    #b, a = signal.ellip(13, 0.009, 80, 0.05, output='ba')
-    sos = signal.ellip(13, 0.009, 80, 0.05, output='sos')
-    x = signal.unit_impulse(700)
-    #y_tf = signal.lfilter(b, a, x)
+    sos = signal.ellip(3, 0.009, 80, 0.05, output='sos')
+    x = signal.unit_impulse(10)
     y_sos = signal.sosfilt(sos, x)
-    plt.plot(y_tf, 'r', label='TF')
-    plt.plot(y_sos, 'k', label='SOS')
-    plt.legend(loc='best')
-    plt.show()
-
-
-
+    print(sos)
+    
+    #print(y_sos)
 
 
     B1 = 12 # Number of bits
-    L1 = math.floor(math.log((2**(B1-1)-1)/max([max(b),max(a)]), 2))  # Round towards zero to avoid overflow
-    bsc = b*(2**B1)
-    asc = a*(2**B1)
-    bsc_int = [int(x) for x in bsc]
-    asc_int = [int(x) for x in asc]
-    print(bsc_int)
-    print(asc_int)
+    L1 = 2**(B1-1) # Round towards zero to avoid overflow
 
-    y1 = fixp_sine(bsc_int, asc_int, B1, L1)
-    #print(y1/2**B1)
-    y2 = floatp_sine(b, a, B1, L1)
-    #y = edge(B1, L1)
+    sos_sc = sos*(2**(B1-1))
+    sos_sc_int = sos_sc.astype(int)
 
-    #print(y1)
-    #print(y2)
-    y1 = y1[6:19] #hardcoded presently. Needs to be 
-    y2 = y2[:13]
+    print(sos_sc_int)
 
-    #print(y1)
-    #print(y2)
-    #print( ((y1 - y2) ** 2).mean(axis=None))
+    y1 = fixp_sine(sos_sc_int, B1, L1)
+    # #print(y1/2**B1)
+    y2 = floatp_sine(sos, B1, L1)
+
+    # #print(y1)
+    # #print(y2)
+    # y1 = y1[6:19] #hardcoded presently. Needs to be 
+    # y2 = y2[:13]
+
+    # #print(y1)
+    # #print(y2)
+    # #print( ((y1 - y2) ** 2).mean(axis=None))
 
 
    

@@ -48,16 +48,21 @@ class FilterHardware(object):
         # A reference to the HDL block
         self.hardware = None
 
-    def set_coefficients(self, coeff_b, coeff_a=None):
+    def set_coefficients(self, coeff_b = None, coeff_a = None, sos = None):
         """Set filter coefficients.
 
         Args:
             coeff_b (list): list of numerator filter coefficients
             coeff_a (list): list of denominator filter coefficients
         """
-        self.b = tuple(coeff_b)
+        if coeff_b is not None:
+            self.b = tuple(coeff_b)
+
         if coeff_a is not None:
             self.a = tuple(coeff_a)
+
+        if sos is not None:
+            self.sos = sos
 
     def set_stimulus(self, sigin):
         """Set filter stimulus
