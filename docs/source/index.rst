@@ -10,6 +10,8 @@ Welcome to filter_blocks's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   getting_started
+   pyfda_api
 
 
 Indices and tables
