@@ -51,8 +51,6 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
     yacc = Signal(intbv(0, min=vmin, max=vmax))
     dvd = Signal(bool(0))
 
-
-
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
         if sigin.valid:
@@ -66,10 +64,9 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
 
     @hdl.always_comb
     def beh_acc():
-         #double precision accumulator
+        # double precision accumulator
         yacc.next = (b0 * x) + (b1 * ffd[0]) + (b2 * ffd[1]) \
                     - (a1 * fbd[0]) - (a2 * fbd[1])
-
 
     @hdl.always_seq(clock.posedge, reset=reset)
     def beh_output():
@@ -79,7 +76,6 @@ def filter_iir(glbl, sigin, sigout, b, a, shared_multiplier=False):
         #print(y)
 
     return beh_direct_form_one, beh_acc, beh_output
-
 
 
 @hdl.block
@@ -93,7 +89,6 @@ def parallel_sum(glbl, b, yin, yout):
     list_of_data = [ds.data for ds in yin]
     list_of_valid = [ds.valid for ds in yin]
 
-
     @hdl.always_seq(clock.posedge, reset=reset)
     def output():
         yout.data = 0
@@ -103,6 +98,7 @@ def parallel_sum(glbl, b, yin, yout):
         print(yout.data)
 
     return output
+
 
 @hdl.block
 def filter_iir_parallel(glbl, x, y, b, a, w):
@@ -124,8 +120,6 @@ def filter_iir_parallel(glbl, x, y, b, a, w):
             glbl, x, y_i[ii],
             b=tuple(map(int, b[ii])), a=tuple(map(int, a[ii])))
 
-
     insts = parallel_sum(glbl, b, y_i, y)
-
 
     return list_of_insts, insts

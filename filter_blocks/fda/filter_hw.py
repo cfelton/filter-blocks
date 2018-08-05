@@ -1,28 +1,37 @@
+
 import numpy as np
 
+
 class FilterHardware(object):
-    """Top level class. Contains filter parameters."""
-    def __init__(self, b, a):
-        """
+    def __init__(self, b=None, a=None):
+        """Top level class. Contains filter parameters
         Args:
             b (list of int): list of numerator coefficients.
-            a (list of int): list of denominator coefficients. 
+            a (list of int): list of denominator coefficients.
+
+        Attrs:
             coef_word_format (tuple of int): word format (W,WI,WF).
-            n_cascades(int):
-            sigin(numpy int array):
-            nfft(int):
-            hdl_name(str):
-            hdl_directory(str):
-            hdl_target(str):
+            n_cascades (int):
+            sigin (numpy int array):
+            nfft (int):
+            hdl_name (str):
+            hdl_directory (str):
+            hdl_target (str):
         """
-        #numerator coefficient
+        # numerator coefficient
         if b is not None:
             self.b = tuple(b)
 
         # denominator coefficients
         if a is not None:
             self.a = tuple(a)
-        
+
+        # TODO: need a default word format, the coefficient
+        #       can be determined from the coefficients if passed
+        #       use an arbitrary value of the input and output
+        self.coef_word_format = (24, 0, 23)
+        self.input_word_format = (16, 0, 15)
+        self.output_word_format = (16, 0, 15)
 
         self.n_cascades = 0
         self.sigin = np.array([])
@@ -39,7 +48,7 @@ class FilterHardware(object):
         # A reference to the HDL block
         self.hardware = None
 
-    def set_coefficients(self, coeff_b, coeff_a = None):
+    def set_coefficients(self, coeff_b, coeff_a=None):
         """Set filter coefficients.
 
         Args:
@@ -57,10 +66,8 @@ class FilterHardware(object):
             sigin (np array int): numpy array of filter stimulus 
             bits (int) : no of bits
         """
-
         self.sigin = sigin.tolist()
 
-    
     def set_cascade(self, n_cascades):
         """Set number of filter cascades
 
@@ -69,13 +76,13 @@ class FilterHardware(object):
         """
         self.n_cascades = n_cascades
 
-    def set_word_format(self, coeff_w, input_w, output_w = (24,23,0)):
+    def set_word_format(self, coeff_w, input_w, output_w=(24, 0, 23)):
         """Set word format
 
         Args:
-            coef_word_format (tuple of int): word format (W,WI,WF)
-            input_word_format (tuple of int): word format (W,WI,WF)
-            output_word_format (tuple of int): word format (W,WI,WF)
+            coef_w (tuple of int): word format (W, WI, WF)
+            input_w (tuple of int): word format (W, WI, WF)
+            output_w (tuple of int): word format (W, WI, WF)
         """
         self.coef_word_format = coeff_w
         self.input_word_format = input_w
