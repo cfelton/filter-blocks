@@ -1,4 +1,5 @@
 
+[![Documentation Status](https://readthedocs.org/projects/filter-blocks/badge/?version=latest)](https://filter-blocks.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/cfelton/filter-blocks.svg?branch=master)](https://travis-ci.org/cfelton/filter-blocks)
 [![Coverage Status](https://coveralls.io/repos/github/cfelton/filter-blocks/badge.svg?branch=master)](https://coveralls.io/github/cfelton/filter-blocks?branch=master)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
