@@ -7,8 +7,8 @@ from myhdl import Signal, intbv, delay
 from filter_blocks.support import Clock, Reset, Global, Samples
 from filter_blocks.testing import DDSine
 
-from filter_blocks.fda import FilterFIR
-
+from filter_blocks.fda.fir import FilterFIR
+#from filter_blocks.fda import FilterFIR    Change back to this when fir and fir_test are merged
 
 def test_filters(args=None):
     if args is None:
@@ -80,6 +80,7 @@ def test_filters(args=None):
 
                 for sr in rlist:
                     sr.record = False
+                    
 
             yield delay(1100)
             raise hdl.StopSimulation

@@ -49,12 +49,12 @@ class Global(object):
 
 
 class Samples(object):
-    def __init__(self, min, max, res=0, dtype=intbv, sample_rate=1):
+    def __init__(self, min, max, word_format = (24, 23, 0), res=0, dtype=intbv, sample_rate=1):
         """Sample streams, input and output to filters.
 
         """
         # @todo: fixed-point support ...
-        word_format = (24, 23, 0)
+        #word_format = (24, 23, 0)
         # The fixed-point word format is described by a tuple, the
         # tuple defines the number of integer bits and fractional bits:
         # (word, int, frac) where: word = int + frac + 1
