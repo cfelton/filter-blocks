@@ -32,6 +32,9 @@ def fixp_sine(bsc_int, asc_int, B1, L1):
     yout = np.divide(y, 2 ** B1)
     print(yout)
     # hdlfilter.convert(hdl = 'verilog')
+    # TODO: plotting should not be included in the tests,
+    #       create simple scripts in filter-blocks/scripts
+    #       for plotting ...
     # plt.plot(yout, 'b')
     # plt.show()
 

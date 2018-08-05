@@ -20,8 +20,11 @@ def test_iir_df1():
     y = hdlfilter.get_response()
     print(y)
     hdlfilter.convert(hdl = 'verilog')
-    plt.plot(y, 'b')
-    plt.show()
+    # TODO: plotting should not be included in the tests,
+    #       create simple scripts in filter-blocks/scripts
+    #       for plotting ...
+    # plt.plot(y, 'b')
+    # plt.show()
 
 
 if __name__ == '__main__':
