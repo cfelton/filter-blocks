@@ -10,6 +10,18 @@
 This repository contains a collection of hardware
 digital filter implementations coded with [myhdl](http://myhdl.org).
 
+
+In addition to the digital filters, this repository also contains
+a class based API that is integrated with the
+[pyfda](https://github.com/chipmuenk/pyFDA)
+project.  A subset of the digital filters can be configured
+and analyzed from the
+[pyfda](https://github.com/chipmuenk/pyFDA) GUI.  
+The filter-blocks and pyfda integration is
+a work in progress and currently exists in beta form.  The
+beginning of the documentation for the pyfda class based
+API can be found [here]().
+
 <!--
 If any of the filter blocks and/or code from this repository are
 used in any publication this repository can be cited with the

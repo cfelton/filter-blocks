@@ -1,22 +1,24 @@
-import myhdl as hdl
+
 import numpy as np
+import myhdl as hdl
+from myhdl import Signal, intbv, StopSimulation
+
 from .filter_hw import FilterHardware
 from ..iir import iir_df1
 from filter_blocks.support import Clock, Reset, Global, Samples
-from myhdl import Signal, intbv, StopSimulation
 
 
 class FilterIIR(FilterHardware):
-    """Contains IIR filter parameters. Parent Class : FilterHardware
-        Args:
-            b (list of int): list of numerator coefficients.
-            a (list of int): list of denominator coefficients. 
-            word format (tuple of int): (W, WI, WF)
-            filter_type:
-            filter_form_type:
-            response(list): list of filter output in int format.
-        """
-    def __init__(self, b = None, a = None):
+    def __init__(self, b=None, a=None):
+        """Contains IIR filter parameters. Parent Class : FilterHardware
+            Args:
+                b (list of int): list of numerator coefficients.
+                a (list of int): list of denominator coefficients.
+                word format (tuple of int): (W, WI, WF)
+                filter_type:
+                filter_form_type:
+                response(list): list of filter output in int format.
+            """
         super(FilterIIR, self).__init__(b, a)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
@@ -25,8 +27,9 @@ class FilterIIR(FilterHardware):
     def get_response(self):
         """Return filter output.
 
-        returns:
-            response(numpy int array) : returns filter output as numpy array
+        Returns:
+            response(numpy int array) : returns filter output as
+            numpy array
         """
         return self.response
 
@@ -34,7 +37,7 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        #testfil.config_sim(trace=True)
+        # testfil.config_sim(trace=True)
         testfil.run_sim()
 
     def convert(self, **kwargs):
@@ -55,21 +58,19 @@ class FilterIIR(FilterHardware):
             rst = reset
             glbl = Global(clk, rst)
             
-            #choose appropriate filter
+            # choose appropriate filter
             iir_hdl = iir_df1.filter_iir
-
-            iir = iir_hdl(glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
-                          shared_multiplier=self._shared_multiplier)
-            
+            iir = iir_hdl(
+                glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
+                shared_multiplier=self._shared_multiplier
+            )
             iir.convert(**kwargs)
-
 
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
         x = Signal(intbv(0, min=-imax, max=imax))
         y = Signal(intbv(0, min=-omax, max=omax))
         xdv, ydv = Signal(bool(0)), Signal(bool(0))
-        
 
         if self.hdl_target.lower() == 'verilog':
             filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
@@ -100,9 +101,8 @@ class FilterIIR(FilterHardware):
         
         # set numsample 
         numsample = len(self.sigin)
-        #process to record output in buffer
+        # process to record output in buffer
         rec_insts = yt.process_record(clock, num_samples=numsample)
-
 
         if self.filter_type == 'direct_form':
             if self.direct_form_type == 1:
@@ -110,17 +110,19 @@ class FilterIIR(FilterHardware):
                 dfilter = iir_df1.filter_iir
 
             if self.n_cascades > 0:
-                filter_insts = iir_sos.filter_iir_sos(glbl, xt, yt, self.b, self.a, self.coef_word_format)
-         
+                # TODO: port the SOS iir into the latest set of interfaces
+                # filter_insts = iir_sos.filter_iir_sos(
+                #     glbl, xt, yt, self.b, self.a, self.coef_word_format
+                # )
+                pass
             else:
-                filter_insts = dfilter(glbl, xt, yt, self.b, self.a, self.coef_word_format)
-
-
-
+                filter_insts = dfilter(
+                    glbl, xt, yt, self.b, self.a, self.coef_word_format
+                )
 
         @hdl.instance
         def stimulus():
-            "record output in numpy array yt.sample_buffer"
+            """record output in numpy array yt.sample_buffer"""
             for k in self.sigin:
                 xt.data.next = int(k)
                 xt.valid = bool(1)
@@ -128,11 +130,10 @@ class FilterIIR(FilterHardware):
                 yt.record = True
                 yt.valid = True
                 yield clock.posedge
-                #Collect a sample from each filter
+                # Collect a sample from each filter
                 yt.record = False
                 yt.valid = False
 
-            #print(yt.sample_buffer)
             self.response = yt.sample_buffer
             # pl.plot(yt.sample_buffer)
             # pl.show()
@@ -140,4 +141,3 @@ class FilterIIR(FilterHardware):
             raise StopSimulation()
 
         return hdl.instances()
-         
