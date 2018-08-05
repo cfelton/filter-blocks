@@ -1,9 +1,11 @@
-from filter_blocks.fda import FilterFIR
+
+import math
+
 import numpy as np
 import scipy.signal as signal
-import math
 import matplotlib.pyplot as plt
 
+from filter_blocks.fda import FilterFIR
 
 
 def fixp_sine(bsc_int, B1, L1):
@@ -27,7 +29,7 @@ def fixp_sine(bsc_int, B1, L1):
     y = hdlfilter.get_response()
 
     yout = np.divide(y,2**L1)
-    #hdlfilter.convert(hdl = 'VHDL')
+    # hdlfilter.convert(hdl = 'VHDL')
     plt.plot(yout, 'b')
     plt.show()
 
