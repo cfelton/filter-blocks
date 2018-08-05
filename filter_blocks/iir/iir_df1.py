@@ -17,11 +17,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     Args:
         b (tuple): numerator coefficents.
         b (tuple): numerator coefficents.
-<<<<<<< HEAD
-
-
-=======
->>>>>>> master
     Returns:
         inst (myhdl.Block, list):
     """
@@ -30,10 +25,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     assert isinstance(b, tuple)
     assert isinstance(a, tuple)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     # All the coefficients need to be an `int`
 
     rb = [isinstance(bb, int) for bb in b]
@@ -43,25 +34,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
 
     w = sigin.word_format
     w_out = sigout.word_format
-<<<<<<< HEAD
-    
-    ymax = 2**(w[0]-1)
-    vmax = 2**(2*w[0])  # top bit is guard bit
-    amax = 2**(2*w[0]-1) #max without guard bit. Value at which output will saturate  
-    #print(2**(2*w[0]-1))
-
-    q, qd = w[0], 2*w[0]   #guard bit not fed back
-
-    o, od = 2*w[0]-w_out[0], 2*w[0]      # guard bit not passed to output
-
-    #print("od-o",od-o)
-
-    if o<0:
-        o=0
-
-
-    N = len(b)-1
-=======
 
     ymax = 2 ** (w[0] - 1)
     vmax = 2 ** (2 * w[0])  # top bit is guard bit
@@ -75,24 +47,15 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     o = 0 if o < 0 else o
 
     N = len(b) - 1
->>>>>>> master
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
     x, xdv = sigin.data, sigin.valid
 
-<<<<<<< HEAD
-    #Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
-    fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
-    yacc = Signal(intbv(0, min=-vmax, max=vmax)) #verify the length of this
-
-=======
     # Delay elements, list-of-signals
     ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
     fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
     yacc = Signal(intbv(0, min=-vmax, max=vmax))  # verify the length of this
->>>>>>> master
 
     dvd = Signal(bool(0))
     #print(len(yacc))
@@ -102,11 +65,7 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
         if sigin.valid:
-<<<<<<< HEAD
-            #print(x)
-=======
             # print(x)
->>>>>>> master
 
             for i in range(N - 1):
                 ffd[i + 1].next = ffd[i]
@@ -115,21 +74,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
             ffd[0].next = x
             fbd[0].next = yacc[qd:q].signed()
 
-<<<<<<< HEAD
-
-    @hdl.always_comb
-    def beh_acc():
-        c = b[0]
-        sop = x*c
-
-        for ii in range(N):
-            c = b[ii+1] #first element in list in b0
-            d = a[ii+1] #first element in list is a0 =1
-            sop = sop + (c * ffd[ii]) - (d * fbd[ii])
-
-        yacc.next = sop
-
-=======
     @hdl.always_comb
     def beh_acc():
         c = b[0]
@@ -141,32 +85,10 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
             sop = sop + (c * ffd[ii]) - (d * fbd[ii])
 
         yacc.next = sop
->>>>>>> master
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-<<<<<<< HEAD
-        #y.next = yacc[od:o].signed()
-
-
-        if (yacc[qd]==1 and yacc[qd-1]==1) or (yacc[qd]==0 and yacc[qd-1]==0):
-            ydv.next = dvd
-            y.next = yacc[od:o].signed()
-            
-        elif yacc[qd]==1 and yacc[qd-1]==0:
-            print('underflow2') 
-            y.next = -amax
-            ydv.next = dvd
-
-
-        elif yacc[qd]==0 and yacc[qd-1]==1:
-            print('overflow2')
-            y.next = amax-1
-            ydv.next = dvd
-
-        #print("y" , y)
-=======
         # y.next = yacc[od:o].signed()
 
         if (yacc[qd] == 1 and yacc[qd - 1] == 1) or (yacc[qd] == 0 and yacc[qd - 1] == 0):
@@ -180,6 +102,5 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
         elif yacc[qd] == 0 and yacc[qd - 1] == 1:
             y.next = amax - 1
             ydv.next = dvd
->>>>>>> master
 
     return hdl.instances()

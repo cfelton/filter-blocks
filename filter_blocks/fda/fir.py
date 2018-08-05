@@ -1,24 +1,3 @@
-<<<<<<< HEAD
-import myhdl as hdl
-import numpy as np
-from .filter_hw import FilterHardware
-from ..fir import fir_df1
-from filter_blocks.support import Clock, Reset, Global, Samples
-from myhdl import Signal, intbv, StopSimulation
-
-
-class FilterFIR(FilterHardware):
-    """Contains FIR filter parameters. Parent Class : FilterHardware
-        Args:
-            b (list of int): list of numerator coefficients.
-            a (list of int): list of denominator coefficients. 
-            word format (tuple of int): (W, WI, WF)
-            filter_type:
-            filter_form_type:
-            response(list): list of filter output in int format.
-        """
-    def __init__(self, b = None, a = None):
-=======
 
 import numpy as np
 import myhdl as hdl
@@ -40,13 +19,10 @@ class FilterFIR(FilterHardware):
                 filter_form_type:
                 response (list): list of filter output in int format.
             """
->>>>>>> master
         super(FilterFIR, self).__init__(b, a)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
         self.response = []
-<<<<<<< HEAD
-=======
 
     def get_response(self):
         """Return filter output.
@@ -163,7 +139,6 @@ class FilterFIR(FilterHardware):
             raise StopSimulation()
 
         return hdl.instances()
->>>>>>> master
 
     def get_response(self):
         """Return filter output.
@@ -291,7 +266,3 @@ class FilterFIR(FilterHardware):
             raise StopSimulation()
 
         return hdl.instances()
-<<<<<<< HEAD
-         
-=======
->>>>>>> master

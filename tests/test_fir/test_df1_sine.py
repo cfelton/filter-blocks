@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-from filter_blocks.fda import FilterFIR
-import numpy as np
-import scipy.signal as signal
-import math
-import matplotlib.pyplot as plt
-
-
-
-def fixp_sine(bsc_int, B1, L1):
-
-=======
 
 import math
 
@@ -21,7 +9,6 @@ from filter_blocks.fda import FilterFIR
 
 
 def fixp_sine(bsc_int, B1, L1):
->>>>>>> master
     N=20
     sig = [np.sin(0.1*np.pi*i) for i in np.arange(0,N,1)]
 
@@ -32,10 +19,6 @@ def fixp_sine(bsc_int, B1, L1):
     sig = sig.round()
     sig = sig.astype(int)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     hdlfilter = FilterFIR()
     hdlfilter.set_coefficients(coeff_b = bsc_int)
     hdlfilter.set_word_format((B1, B1-1, 0),(B2, B2-1 ,0),(17 , 30, 0))
@@ -44,28 +27,17 @@ def fixp_sine(bsc_int, B1, L1):
     y = hdlfilter.get_response()
 
     yout = np.divide(y,2**L1)
-<<<<<<< HEAD
-    #hdlfilter.convert(hdl = 'VHDL')
-    plt.plot(yout, 'b')
-    plt.show()
-=======
     # hdlfilter.convert(hdl = 'VHDL')
     # TODO: plotting should not be included in the tests,
     #       create simple scripts in filter-blocks/scripts
     #       for plotting ...
     # plt.plot(yout, 'b')
     # plt.show()
->>>>>>> master
 
     return yout
 
 
 def edge(B1, L1):
-<<<<<<< HEAD
-
-
-=======
->>>>>>> master
     B2 = 12
     N = 10 # number of coefficients
 
@@ -122,16 +94,8 @@ def floatp_sine(b, L1):
     return y
 
 
-<<<<<<< HEAD
-
-
-def main():
-    """Meant to emulate how pyfda will pass parameters to filters"""
-    
-=======
 def test_df1_sine():
     """Meant to emulate how pyfda will pass parameters to filters"""
->>>>>>> master
     fs = 1000.
     f1 = 45.
     f2 = 95.
@@ -144,34 +108,17 @@ def test_df1_sine():
     bsc = b*(2**L1)
     bsc_int = [int(x) for x in bsc]
 
-<<<<<<< HEAD
-
-    y1 = fixp_sine(bsc_int, B1, L1)
-    y2 = floatp_sine(b, L1)
-    #y = edge(B1, L1)
-
-=======
     y1 = fixp_sine(bsc_int, B1, L1)
     y2 = floatp_sine(b, L1)
     # y = edge(B1, L1)
->>>>>>> master
 
     y1 = y1[6:19] #hardcoded presently. Needs to be 
     y2 = y2[:13]
 
     print(y1)
     print(y2)
-<<<<<<< HEAD
-    print( ((y1 - y2) ** 2).mean(axis=None))
-
-
-   
-if __name__ == '__main__':
-    main()
-=======
     print(((y1 - y2) ** 2).mean(axis=None))
 
 
 if __name__ == '__main__':
     test_df1_sine()
->>>>>>> master

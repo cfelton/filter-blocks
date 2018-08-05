@@ -8,11 +8,6 @@ from filter_blocks.support import Clock, Reset, Global, Samples
 from filter_blocks.testing import DDSine
 
 from filter_blocks.fda.fir import FilterFIR
-<<<<<<< HEAD
-#from filter_blocks.fda import FilterFIR    Change back to this when fir and fir_test are merged
-=======
-
->>>>>>> master
 
 def test_filters(args=None):
     if args is None:

@@ -3,14 +3,10 @@ import math
 import myhdl as hdl
 from myhdl import Signal, intbv, always_seq
 from filter_blocks.support import Samples, Signals
-import math
 
 
 @hdl.block
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     """Basic FIR direct-form I filter.
 
@@ -28,70 +24,14 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     assert isinstance(sigin, Samples)
     assert isinstance(sigout, Samples)
     assert isinstance(b, tuple)
-<<<<<<< HEAD
-    #All the coefficients need to be an `int`
-=======
     # All the coefficients need to be an `int`
->>>>>>> master
     rb = [isinstance(bb, int) for bb in b]
     assert all(rb)
 
     w = sigin.word_format
     w_out = sigout.word_format
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> master
-
-    #print(sigin.word_format)
-    #print(sigout.word_format)
-
-
-    ymax = 2**(w[0]-1)
-<<<<<<< HEAD
-=======
-    vmax = 2**(2*w[0])  # double width max and min
-    vmin = -vmax
-    ymin = -ymax
->>>>>>> master
-    #vmax = 2**(2*w[0])  # double width max and min
-
-    N = len(b)-1
-
-
-<<<<<<< HEAD
-    sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
-    #acc_bits = w[0] + coef_w[0] + int(math.log(N, 2))
-    #print(w[0] + coef_w[0] + int(math.log(N, 2)))
-    #print(w[0] + coef_w[0] + int(math.log(sum_abs_b, 2)))
-    print(w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2)))
-    acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2)) -1
-    amax = 2**(acc_bits-1)
-    
-    #print(acc_bits)
-
-    qd = acc_bits
-    q = acc_bits-w_out[0]
-
-    print(qd)
-    print(q)
-
-    if q<0:
-        q=0
-
-    print(qd-q)
-    clock, reset = glbl.clock, glbl.reset
-    xdv = sigin.valid
-    y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min = - ymax, max = ymax))
-    # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min = -ymax, max = ymax), N)
-    yacc = Signal(intbv(0, min = - amax, max = amax)) #verify the length of this
-=======
-=======
     ntaps = len(b)-1
     ymax = 2 ** (w[0]-1)
->>>>>>> upstream/master
     sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
     acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
     amax = 2**(acc_bits-1)
@@ -108,7 +48,6 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     # Delay elements, list-of-signals
     ffd = Signals(intbv(0, min=-ymax, max=ymax), ntaps)
     yacc = Signal(intbv(0, min=-amax, max=amax))
->>>>>>> master
     dvd = Signal(bool(0))
 
     @hdl.always(clock.posedge)
@@ -116,42 +55,23 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
         if sigin.valid:
             x.next = sigin.data
 
-<<<<<<< HEAD
-            for i in range(N-1):
-=======
             for i in range(ntaps-1):
->>>>>>> master
                 ffd[i+1].next = ffd[i]
 
             ffd[0].next = x
             # sum-of-products loop
             c = b[0]
-<<<<<<< HEAD
-            sop = x*c
-
-            for ii in range(N):
-                c = b[ii+1]
-                sop = sop + (c * ffd[ii])
-            yacc.next = sop
-            #print(yacc)
-=======
             sop = x * c
 
             for ii in range(ntaps):
                 c = b[ii+1]
                 sop = sop + (c * ffd[ii])
             yacc.next = sop
->>>>>>> master
 
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
         y.next = yacc[qd:q].signed()
-<<<<<<< HEAD
-        #print(y)
-        #y.next = yacc.signed()
-=======
->>>>>>> master
         ydv.next = dvd
 
     return beh_direct_form_one, beh_output
