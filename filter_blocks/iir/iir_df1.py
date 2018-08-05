@@ -64,7 +64,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
 
 
     dvd = Signal(bool(0))
-
     #print(len(yacc))
 
     @hdl.always(clock.posedge)
@@ -103,14 +102,14 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
             ydv.next = dvd
             y.next = yacc[od:o].signed()
             
-        elif yacc[qd+1]==1 and yacc[qd]==0:
-            #print('underflow2') 
+        elif yacc[qd]==1 and yacc[qd-1]==0:
+            print('underflow2') 
             y.next = -amax
             ydv.next = dvd
 
 
         elif yacc[qd]==0 and yacc[qd-1]==1:
-            #print('overflow2')
+            print('overflow2')
             y.next = amax-1
             ydv.next = dvd
 
