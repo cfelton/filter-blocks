@@ -39,7 +39,7 @@ class DDSine(object):
     @hdl.block
     def process(self, clock, reset, xi, xf):
         # determine the number of clocks per sample rate
-        # @todo: warning and/or dual-modulus for non-int
+        # TODO: warning and/or dual-modulus for non-int
         # if  is None:
         #     = Sample(min=self._min, max=self._max)
         assert isinstance(xi, Samples)
