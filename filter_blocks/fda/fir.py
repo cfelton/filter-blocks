@@ -37,6 +37,19 @@ class FilterFIR(FilterHardware):
         testfil = self.filter_block()
         testfil.run_sim()
 
+    def info(self):
+        """Print filter info"""
+        print("Filter type :", self.filter_type, "\n"
+              "Filter order :", len(self.b), "\n"
+              "Arithmatic :", "fixed", "\n"
+              "Coefficient format :", self.coef_word_format ,"\n"
+              "Input format :", self.input_word_format ,"\n"
+              "Accumulator size :", "\n"
+              "Output format :", self.output_word_format ,"\n"
+              "Round mode :", "no rounding", "\n"
+              "Overflow mode :" "saturate"
+            )
+
     def convert(self, **kwargs):
         """Convert the HDL description to Verilog and VHDL.
         """

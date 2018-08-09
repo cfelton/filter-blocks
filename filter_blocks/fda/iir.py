@@ -52,7 +52,7 @@ class FilterIIR(FilterHardware):
               "Round mode :", "no rounding", "\n"
               "Overflow mode :" "saturate"
 
-         )
+            )
 
     def convert(self, **kwargs):
         """Convert the HDL description to Verilog and VHDL.
