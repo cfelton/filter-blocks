@@ -37,8 +37,22 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        # testfil.config_sim(trace=True)
-        testfil.run_sim()
+        testfil.config_sim(trace=True)
+        #testfil.run_sim()
+
+    def info(self):
+        """Print filter info"""
+        print("Filter type :", self.filter_type, "\n"
+              "Filter order :", len(self.b), "\n"
+              "Arithmatic :", "fixed", "\n"
+              "Coefficient format :", self.coef_word_format ,"\n"
+              "Input format :", self.input_word_format ,"\n"
+              "Accumulator size :", "\n"
+              "Output format :", self.output_word_format ,"\n"
+              "Round mode :", "no rounding", "\n"
+              "Overflow mode :" "saturate"
+
+         )
 
     def convert(self, **kwargs):
         """Convert the HDL description to Verilog and VHDL.
@@ -88,7 +102,7 @@ class FilterIIR(FilterHardware):
         w = self.input_word_format
         w_out = self.output_word_format
         
-        ymax = 2**(w[0]-1)
+        ymax = 2**(2*w[0]-1)
         vmax = 2**(2*w[0])
         omax = 2**(w_out[0]-1)
         xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)

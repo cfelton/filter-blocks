@@ -47,7 +47,7 @@ def filter_iir(glbl, sigin, sigout, sos, shared_multiplier=False):
 
     w = sigin.word_format
     ymax = 2**(w[0]-1)
-    vmax = 2**(2*w[0])  # double width max and min
+    vmax = 2**(100*w[0])  # double width max and min
     vmin = -vmax
 
     # Quantized IIR coefficients
@@ -74,7 +74,8 @@ def filter_iir(glbl, sigin, sigout, sos, shared_multiplier=False):
             ffd[0].next = x
 
             fbd[1].next = fbd[0]
-            fbd[0].next = yacc[qd:q].signed()
+            #fbd[0].next = yacc[qd:q].signed()
+            fbd[0].next = yacc.signed()
 
     @always_comb
     def beh_acc():
