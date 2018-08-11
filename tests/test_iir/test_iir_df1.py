@@ -38,15 +38,15 @@ def test_iir_df1():
     #
     hdlfilter.set_word_format((16,23,0), (16, 23, 0), (100, 53, 0))
     hdlfilter.set_stimulus(stim)
-    #hdlfilter.run_sim()
+    hdlfilter.run_sim()
     #hdlfilter.convert(hdl = 'verilog')
-    hdlfilter.info()
-    #y = hdlfilter.get_response()
+    #hdlfilter.info()
+    y = hdlfilter.get_response()
 
     y_tf = signal.lfilter(b, a, stim)
 
-    #print(y)
-    print(y_tf)
+    print(y)
+    #print(y_tf)
     hdlfilter.convert(hdl = 'verilog')
     # TODO: plotting should not be included in the tests,
     #       create simple scripts in filter-blocks/scripts

@@ -9,7 +9,7 @@ from filter_blocks.support import Clock, Reset, Global, Samples
 
 
 class FilterIIR(FilterHardware):
-    def __init__(self, b=None, a=None):
+    def __init__(self, b = None, a = None):
         """Contains IIR filter parameters. Parent Class : FilterHardware
             Args:
                 b (list of int): list of numerator coefficients.
@@ -37,8 +37,8 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        testfil.config_sim(trace=True)
-        #testfil.run_sim()
+        #testfil.config_sim(trace=True)
+        testfil.run_sim()
 
     def info(self):
         """Print filter info"""
@@ -51,7 +51,6 @@ class FilterIIR(FilterHardware):
               "Output format :", self.output_word_format ,"\n"
               "Round mode :", "no rounding", "\n"
               "Overflow mode :" "saturate"
-
             )
 
     def convert(self, **kwargs):
@@ -74,6 +73,7 @@ class FilterIIR(FilterHardware):
             
             # choose appropriate filter
             iir_hdl = iir_df1.filter_iir
+
             iir = iir_hdl(
                 glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
                 shared_multiplier=self._shared_multiplier
@@ -126,9 +126,10 @@ class FilterIIR(FilterHardware):
 
             if self.n_cascades > 0:
                 # TODO: port the SOS iir into the latest set of interfaces
-                filter_insts = iir_sos.filter_iir_sos(
-                     glbl, xt, yt, self.sos, self.coef_word_format
-                )
+                #filter_insts = iir_sos.filter_iir_sos(
+                #     glbl, xt, yt, self.sos, self.coef_word_format
+                #)
+                pass
             
             else:
                 filter_insts = dfilter(

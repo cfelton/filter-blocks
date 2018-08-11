@@ -23,7 +23,6 @@ class FilterFIR(FilterHardware):
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
         self.response = []
-        self.bit_growth
 
 
     def get_response(self):

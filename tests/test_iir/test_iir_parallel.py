@@ -23,10 +23,11 @@ def test_iir_api():
 
     b = [[1, 0, 1], [0, 0, 1]]
     a = [[0, 1], [0, 0]]
-    w = (24, 0)
+    w = (24, 23, 0)
 
-    iir_test = FilterIIR(b, a)
-    iir = iir_test.filter_block(glbl, x, y, b, a, w)
+    #iir_test = FilterIIR(b, a)
+
+    iir = iir_parallel.filter_iir_parallel(glbl, x, y, b, a, w)
 
     @hdl.instance
     def stimulus():

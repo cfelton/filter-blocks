@@ -65,7 +65,7 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     ########## method 2 of calculating accumulator size based on fir filter implementation
 
     acc_bits = w[0] + coef_w[0] + math.floor(math.log(N, 2))
-    print(acc_bits)
+    #print(acc_bits)
     amax = 2**(acc_bits-1)
     od = acc_bits - 1
     o = acc_bits-w_out[0] - 1
@@ -92,7 +92,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     @hdl.always(clock.posedge)
     def beh_direct_form_one():
         if sigin.valid:
-            # print(x)
 
             for i in range(N - 1):
                 ffd[i + 1].next = ffd[i]
