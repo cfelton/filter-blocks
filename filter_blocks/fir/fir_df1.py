@@ -30,25 +30,8 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
 
     w = sigin.word_format
     w_out = sigout.word_format
-<<<<<<< HEAD
-
-    #print(sigin.word_format)
-    #print(sigout.word_format)
-
-
-    ymax = 2**(w[0]-1)
-    vmax = 2**(2*w[0])  # double width max and min
-    vmin = -vmax
-    ymin = -ymax
-    #vmax = 2**(2*w[0])  # double width max and min
-
-    N = len(b)-1
-
-
-=======
     ntaps = len(b)-1
     ymax = 2 ** (w[0]-1)
->>>>>>> upstream/master
     sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
     acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
     amax = 2**(acc_bits-1)
