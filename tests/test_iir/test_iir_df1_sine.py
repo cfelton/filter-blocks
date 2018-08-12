@@ -64,8 +64,8 @@ def test_iir_df1_sine():
     """Meant to emulate how pyfda will pass parameters to filters"""
 
 
-    b, a = signal.ellip(3, 5, 40, 0.6, output='ba')
-    #b, a = signal.bessel(4, 0.09, 'low')
+    #b, a = signal.ellip(3, 5, 40, 0.6, output='ba')
+    b, a = signal.bessel(4, 0.09, 'low')
 
     print(b)
     print(a)

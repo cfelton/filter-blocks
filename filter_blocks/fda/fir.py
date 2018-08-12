@@ -43,7 +43,7 @@ class FilterFIR(FilterHardware):
               "Accumulator size :", "\n"
               "Output format :", self.output_word_format ,"\n"
               "Round mode :", "no rounding", "\n"
-              "Overflow mode :" "saturate"
+              "Overflow mode :" "no overflow"
             )
 
     def run_sim(self):
