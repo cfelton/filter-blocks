@@ -9,7 +9,6 @@ from filter_blocks.fda import FilterIIR
 
 
 # TODO: fix these, they should not be failing!
-@pytest.mark.xfail
 @hdl.block
 def test_iir_api():
     
@@ -18,25 +17,26 @@ def test_iir_api():
     glbl = Global(clock, reset)
     tbclk = clock.process()
 
-    x = Signal(intbv(0)[8:])
-    y = Signal(intbv(0)[20:])
+    w = (24,0,23)
+    w_out = (24,0,23)
+        
+    ymax = 2**(2*w[0]-1)
+    vmax = 2**(2*w[0])
+    omax = 2**(w_out[0]-1)
 
-    b = [[1, 0, 1], [0, 0, 1]]
-    a = [[0, 1], [0, 0]]
-    w = (24, 0)
+    xt = Samples(min=-ymax, max=ymax, word_format = w)
+    yt = Samples(min=-omax, max=omax, word_format = w_out)
 
-    iir_test = FilterIIR(b, a)
-    iir = iir_test.filter_block(glbl, x, y, b, a, w)
+    b = [[101, 0, 132], [23324, 0, 232]]
+    a = [[24223, 1], [233, 0]]
+    w = (24, 23, 0)
 
-    @hdl.instance
-    def stimulus():
-        """Input for test bench taken from text file test.txt"""
-        for line in open('test.txt'):
-            x.next = int(line)
-            yield clock.posedge
-        raise StopSimulation
+    #iir_test = FilterIIR(b, a)
 
-    return iir, stimulus, tbclk
+    iir = iir_parallel.filter_iir_parallel(glbl, xt, yt, b, a, w)
+
+
+    return hdl.instances()
 
 
 @pytest.mark.xfail

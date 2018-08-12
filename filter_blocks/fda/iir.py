@@ -4,12 +4,12 @@ import myhdl as hdl
 from myhdl import Signal, intbv, StopSimulation
 
 from .filter_hw import FilterHardware
-from ..iir import iir_df1
+from ..iir import iir_df1, iir_sos
 from filter_blocks.support import Clock, Reset, Global, Samples
 
 
 class FilterIIR(FilterHardware):
-    def __init__(self, b=None, a=None):
+    def __init__(self, b = None, a = None):
         """Contains IIR filter parameters. Parent Class : FilterHardware
             Args:
                 b (list of int): list of numerator coefficients.
@@ -37,8 +37,21 @@ class FilterIIR(FilterHardware):
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        # testfil.config_sim(trace=True)
+        #testfil.config_sim(trace=True)
         testfil.run_sim()
+
+    def info(self):
+        """Print filter info"""
+        print("Filter type :", self.filter_type, "\n"
+              "Filter order :", len(self.b), "\n"
+              "Arithmatic :", "fixed", "\n"
+              "Coefficient format :", self.coef_word_format ,"\n"
+              "Input format :", self.input_word_format ,"\n"
+              "Accumulator size :", "\n"
+              "Output format :", self.output_word_format ,"\n"
+              "Round mode :", "no rounding", "\n"
+              "Overflow mode :" "saturate"
+            )
 
     def convert(self, **kwargs):
         """Convert the HDL description to Verilog and VHDL.
@@ -60,6 +73,7 @@ class FilterIIR(FilterHardware):
             
             # choose appropriate filter
             iir_hdl = iir_df1.filter_iir
+
             iir = iir_hdl(
                 glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
                 shared_multiplier=self._shared_multiplier
@@ -71,6 +85,7 @@ class FilterIIR(FilterHardware):
         x = Signal(intbv(0, min=-imax, max=imax))
         y = Signal(intbv(0, min=-omax, max=omax))
         xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        
 
         if self.hdl_target.lower() == 'verilog':
             filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
@@ -87,7 +102,7 @@ class FilterIIR(FilterHardware):
         w = self.input_word_format
         w_out = self.output_word_format
         
-        ymax = 2**(w[0]-1)
+        ymax = 2**(2*w[0]-1)
         vmax = 2**(2*w[0])
         omax = 2**(w_out[0]-1)
         xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
@@ -111,10 +126,11 @@ class FilterIIR(FilterHardware):
 
             if self.n_cascades > 0:
                 # TODO: port the SOS iir into the latest set of interfaces
-                # filter_insts = iir_sos.filter_iir_sos(
-                #     glbl, xt, yt, self.b, self.a, self.coef_word_format
-                # )
+                #filter_insts = iir_sos.filter_iir_sos(
+                #     glbl, xt, yt, self.sos, self.coef_word_format
+                #)
                 pass
+            
             else:
                 filter_insts = dfilter(
                     glbl, xt, yt, self.b, self.a, self.coef_word_format

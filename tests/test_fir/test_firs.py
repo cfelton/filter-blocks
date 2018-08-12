@@ -9,7 +9,6 @@ from filter_blocks.testing import DDSine
 
 from filter_blocks.fda.fir import FilterFIR
 
-
 def test_filters(args=None):
     if args is None:
         ntaps, nbands, fs, imax = 86, 3, 1e5, 2**7
@@ -80,6 +79,7 @@ def test_filters(args=None):
 
                 for sr in rlist:
                     sr.record = False
+                    
 
             yield delay(1100)
             raise hdl.StopSimulation
